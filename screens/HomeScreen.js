@@ -18,15 +18,15 @@ const HomeScreen = ({ onWallet, onLogout }) => {
   const [balance] = useState('R$ 180.250,00');
 
   const menuItems = [
-    { id: 1, title: 'Resgate', icon: 'refresh' },
-    { id: 2, title: 'Crédito para investidores', icon: 'card', badge: 'Novo' },
-    { id: 3, title: 'Poupança', icon: 'wallet' },
+    { id: 1, title: 'Calculadora de Câmbio', icon: 'calculator' },
+    { id: 2, title: 'Simulador', icon: 'analytics', badge: 'Novo' },
+    { id: 3, title: 'Escritórios', icon: 'business' },
     { id: 4, title: 'Mostrar mais', icon: 'ellipsis-horizontal' },
   ];
 
   const investmentOptions = [
-    { title: 'Renda Fixa', subtitle: 'Vence em 2 anos', yield: '111% do CDI' },
-    { title: 'Renda Fixa Isenta', subtitle: 'Vence em 3 anos', yield: '95% do CDI' },
+    { title: 'PRIVATE', subtitle: '4 Meses', yield: '1% ao mês' },
+    { title: 'SELECT', subtitle: '24 Meses', yield: '2% ao mês' },
   ];
 
   const rightActions = [
@@ -35,8 +35,8 @@ const HomeScreen = ({ onWallet, onLogout }) => {
       onPress: toggleTheme 
     },
     { 
-      icon: 'eye-outline', 
-      onPress: () => console.log('Toggle visibility') 
+      icon: 'notifications-outline', 
+      onPress: () => console.log('Notifications') 
     }
   ];
 
@@ -88,40 +88,21 @@ const HomeScreen = ({ onWallet, onLogout }) => {
 
         {/* Cards Promocionais */}
         <View style={styles.promoSection}>
-          {/* Card Cripto */}
-          <View style={styles.cryptoCard}>
-            <View style={styles.cryptoContent}>
-              <Text style={styles.cryptoTitle}>A hora</Text>
-              <Text style={styles.cryptoTitle}>é agora!</Text>
-              <TouchableOpacity style={styles.cryptoButton}>
-                <Text style={styles.cryptoButtonText}>Invista em cripto</Text>
+          {/* Card Participação Disponível */}
+          <View style={styles.participationCard}>
+            <View style={styles.participationContent}>
+              <Text style={styles.participationTitle}>Participação</Text>
+              <Text style={styles.participationTitle}>Disponível</Text>
+              <Text style={styles.participationPeriod}>do dia 01 ao dia 05</Text>
+              <TouchableOpacity style={styles.participationButton}>
+                <Text style={styles.participationButtonText}>Participar agora</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.cryptoCoin}>
-              <Text style={styles.bitcoinIcon}>₿</Text>
+            <View style={styles.participationIcon}>
+              <Text style={styles.calendarIcon}>📅</Text>
             </View>
           </View>
 
-          {/* Card Porquinho */}
-          <View style={styles.piggyCard}>
-            <View style={styles.piggyBadge}>
-              <Text style={styles.piggyBadgeText}>Meu Porquinho</Text>
-            </View>
-            <View style={styles.piggyContent}>
-              <Text style={styles.piggyText}>Seu passaporte</Text>
-              <Text style={styles.piggyText}>para a <Text style={styles.piggyHighlight}>reserva</Text></Text>
-              <Text style={styles.piggyHighlight}>de emergência!</Text>
-              <TouchableOpacity style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Guardar dinheiro</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.piggyIcons}>
-              <Text style={styles.pigEmoji}>🐷</Text>
-              <View style={styles.lifeRing}>
-                <Text style={styles.lifeRingEmoji}>🛟</Text>
-              </View>
-            </View>
-          </View>
         </View>
 
         {/* Oportunidades do Dia */}
@@ -144,26 +125,25 @@ const HomeScreen = ({ onWallet, onLogout }) => {
       {/* Navegação Inferior */}
       <SafeAreaView style={styles.bottomNavSafeArea}>
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="home" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Início</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <Ionicons name="trending-up" size={24} color={themeColors.secondary} />
-            <Text style={[styles.navText, styles.activeNavText]}>Invest</Text>
+            <Ionicons name="home" size={24} color={themeColors.secondary} />
+            <Text style={[styles.navText, styles.activeNavText]}>Início</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={onWallet}>
+            <Ionicons name="wallet" size={24} color={themeColors.darkGray} />
+            <Text style={styles.navText}>Carteira</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="people" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Forum</Text>
-            <View style={styles.notificationDot} />
+            <Ionicons name="trending-up" size={24} color={themeColors.darkGray} />
+            <Text style={styles.navText}>Investimento</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.navItem}>
             <Ionicons name="bag" size={24} color={themeColors.darkGray} />
             <Text style={styles.navText}>Shop</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="grid" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Todos</Text>
+            <Ionicons name="person" size={24} color={themeColors.darkGray} />
+            <Text style={styles.navText}>Meu perfil</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

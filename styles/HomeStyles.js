@@ -95,7 +95,7 @@ const createStyles = () => {
       paddingHorizontal: 20,
       marginBottom: 20,
     },
-    cryptoCard: {
+    participationCard: {
       backgroundColor: themeColors.primary,
       borderRadius: 12,
       padding: 20,
@@ -104,28 +104,34 @@ const createStyles = () => {
       alignItems: 'center',
       marginBottom: 12,
     },
-    cryptoContent: {
+    participationContent: {
       flex: 1,
     },
-    cryptoTitle: {
+    participationTitle: {
       fontSize: 20,
       fontWeight: 'bold',
       color: themeColors.white,
     },
-    cryptoButton: {
+    participationPeriod: {
+      fontSize: 14,
+      color: themeColors.white,
+      opacity: 0.8,
+      marginTop: 4,
+      marginBottom: 12,
+    },
+    participationButton: {
       backgroundColor: themeColors.secondary,
       borderRadius: 20,
       paddingHorizontal: 16,
       paddingVertical: 8,
       alignSelf: 'flex-start',
-      marginTop: 12,
     },
-    cryptoButtonText: {
+    participationButtonText: {
       color: themeColors.white,
       fontSize: 12,
       fontWeight: 'bold',
     },
-    cryptoCoin: {
+    participationIcon: {
       width: 60,
       height: 40,
       backgroundColor: themeColors.white,
@@ -133,9 +139,8 @@ const createStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    bitcoinIcon: {
+    calendarIcon: {
       fontSize: 24,
-      color: themeColors.primary,
     },
     piggyCard: {
       backgroundColor: themeColors.lightGray,

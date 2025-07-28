@@ -38,7 +38,7 @@ const WalletScreen = ({ onBack }) => {
 
   const rightActions = [
     { icon: 'refresh-outline', onPress: () => console.log('Refresh') },
-    { icon: 'eye-outline', onPress: () => console.log('Toggle visibility') }
+    { icon: 'notifications-outline', onPress: () => console.log('Notifications') }
   ];
 
   return (
