@@ -10,12 +10,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import CustomHeader from '../components/CustomHeader';
+import SideMenu from '../components/SideMenu';
 import createStyles from '../styles/HomeStyles';
 
 const HomeScreen = ({ onWallet, onLogout }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
   const styles = createStyles();
   const [balance] = useState('R$ 180.250,00');
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const menuItems = [
     { id: 1, title: 'Calculadora de Câmbio', icon: 'calculator' },
@@ -40,13 +42,28 @@ const HomeScreen = ({ onWallet, onLogout }) => {
     }
   ];
 
+  const handleMenuNavigation = (screen) => {
+    if (screen === 'wallet') {
+      onWallet();
+    }
+    setIsMenuVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <CustomHeader 
-        title="Investimentos"
-        leftIcon="log-out-outline"
-        leftAction={onLogout}
+        showCenteredLogo={true}
+        leftIcon="menu-outline"
+        leftAction={() => setIsMenuVisible(true)}
         rightActions={rightActions}
+      />
+
+      {/* Menu Lateral */}
+      <SideMenu
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        onLogout={onLogout}
+        onNavigate={handleMenuNavigation}
       />
 
       {/* Conteúdo Rolável */}

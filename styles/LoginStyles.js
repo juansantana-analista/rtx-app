@@ -21,11 +21,13 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: themeColors.text
+    color: themeColors.text,
+    letterSpacing: -0.3,
   },
   welcomeSubtitle: {
     fontSize: 16,
-    color: themeColors.darkGray
+    color: themeColors.textSecondary || themeColors.darkGray,
+    fontWeight: '500',
   },
   formContainer: {
     flex: 1,
@@ -36,26 +38,26 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: '600',
     color: themeColors.text
   },
   input: {
     height: 50,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    borderColor: themeColors.mediumGray,
-    backgroundColor: themeColors.lightGray,
+    borderColor: themeColors.border || themeColors.mediumGray,
+    backgroundColor: themeColors.cardBackground || themeColors.lightGray,
     color: themeColors.text
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: themeColors.mediumGray,
-    backgroundColor: themeColors.lightGray
+    borderRadius: 12,
+    borderColor: themeColors.border || themeColors.mediumGray,
+    backgroundColor: themeColors.cardBackground || themeColors.lightGray
   },
   passwordInput: {
     flex: 1,
@@ -73,15 +75,21 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: themeColors.secondary
+    color: themeColors.accent || themeColors.secondary,
+    fontWeight: '600',
   },
   loginButton: {
     height: 50,
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
-    backgroundColor: themeColors.secondary
+    backgroundColor: themeColors.accent || themeColors.secondary,
+    shadowColor: themeColors.shadow || themeColors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   loginButtonText: {
     color: themeColors.white,
@@ -93,6 +101,7 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 10,
+    fontWeight: '500',
   },
   divider: {
     flexDirection: 'row',
@@ -102,27 +111,30 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: themeColors.mediumGray
+    backgroundColor: themeColors.border || themeColors.mediumGray
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: themeColors.darkGray
+    color: themeColors.textSecondary || themeColors.darkGray,
+    fontWeight: '500',
   },
   biometricButton: {
     height: 50,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
-    borderColor: themeColors.secondary
+    borderColor: themeColors.border || themeColors.secondary,
+    backgroundColor: themeColors.cardBackground,
   },
   biometricButtonText: {
     fontSize: 16,
     marginLeft: 8,
-    color: themeColors.secondary
+    color: themeColors.accent || themeColors.secondary,
+    fontWeight: '600',
   },
   footerSafeArea: {
     backgroundColor: themeColors.background,
@@ -136,11 +148,12 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
   },
   registerButtonText: {
     fontSize: 14,
-    color: themeColors.darkGray
+    color: themeColors.textSecondary || themeColors.darkGray,
+    fontWeight: '500',
   },
   registerLink: {
     fontWeight: 'bold',
-    color: themeColors.secondary
+    color: themeColors.accent || themeColors.secondary
   },
 });
 

@@ -10,7 +10,8 @@ const CustomHeader = ({
   leftAction, 
   rightActions = [], 
   showLogo = false,
-  logoHeight = 120 
+  logoHeight = 120,
+  showCenteredLogo = false // Nova prop para mostrar logo centralizado
 }) => {
   const { themeColors } = useTheme();
   const headerStyles = createHeaderStyles(themeColors);
@@ -64,7 +65,15 @@ const CustomHeader = ({
           </View>
           
           <View style={headerStyles.headerCenter}>
-            <Text style={headerStyles.headerTitle}>{title}</Text>
+            {showCenteredLogo ? (
+              <Image 
+                source={require('../assets/rtx-x-color.png')} 
+                style={{ width: 120, height: 30 }}
+                resizeMode="contain"
+              />
+            ) : (
+              <Text style={headerStyles.headerTitle}>{title}</Text>
+            )}
           </View>
           
           <View style={headerStyles.headerRight}>

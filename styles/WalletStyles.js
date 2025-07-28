@@ -16,30 +16,33 @@ const createStyles = () => {
     balanceCard: {
       backgroundColor: themeColors.cardBackground,
       margin: 20,
-      padding: 20,
-      borderRadius: 12,
-      shadowColor: themeColors.black,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      padding: 24,
+      borderRadius: 16,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 6,
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
     },
     balance: {
       fontSize: 32,
       fontWeight: 'bold',
       color: themeColors.text,
-      marginBottom: 20,
+      marginBottom: 24,
+      letterSpacing: -0.5,
     },
     investmentBreakdown: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
     investmentRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 12,
+      paddingVertical: 16,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors.mediumGray,
+      borderBottomColor: themeColors.border || themeColors.mediumGray,
     },
     flagContainer: {
       flexDirection: 'row',
@@ -53,12 +56,14 @@ const createStyles = () => {
     cryptoIcon: {
       fontSize: 20,
       marginRight: 12,
-      color: themeColors.secondary,
+      color: themeColors.accent || themeColors.secondary,
+      fontWeight: 'bold',
     },
     investmentLabel: {
       fontSize: 16,
       color: themeColors.text,
       flex: 1,
+      fontWeight: '500',
     },
     helpIcon: {
       marginLeft: 8,
@@ -70,23 +75,24 @@ const createStyles = () => {
     },
     investUSA: {
       fontSize: 16,
-      color: themeColors.secondary,
-      fontWeight: '500',
+      color: themeColors.accent || themeColors.secondary,
+      fontWeight: '600',
     },
     rescueSection: {
       borderTopWidth: 1,
-      borderTopColor: themeColors.mediumGray,
-      paddingTop: 16,
+      borderTopColor: themeColors.border || themeColors.mediumGray,
+      paddingTop: 20,
       position: 'relative',
     },
     rescueLabel: {
       fontSize: 14,
-      color: themeColors.darkGray,
+      color: themeColors.textSecondary || themeColors.darkGray,
       marginBottom: 8,
+      fontWeight: '500',
     },
     rescueHelp: {
       position: 'absolute',
-      top: 16,
+      top: 20,
       right: 0,
     },
     rescueRow: {
@@ -98,11 +104,12 @@ const createStyles = () => {
       fontSize: 18,
       fontWeight: 'bold',
       color: themeColors.text,
+      letterSpacing: -0.2,
     },
     rescueButton: {
       fontSize: 16,
-      color: themeColors.secondary,
-      fontWeight: '500',
+      color: themeColors.accent || themeColors.secondary,
+      fontWeight: '600',
     },
     brazilSection: {
       paddingHorizontal: 20,
@@ -118,14 +125,15 @@ const createStyles = () => {
       fontWeight: 'bold',
       color: themeColors.text,
       marginRight: 8,
+      letterSpacing: -0.2,
     },
     reorderButton: {
       marginLeft: 'auto',
     },
     reorderText: {
       fontSize: 14,
-      color: themeColors.secondary,
-      fontWeight: '500',
+      color: themeColors.accent || themeColors.secondary,
+      fontWeight: '600',
     },
     periodSelector: {
       flexDirection: 'row',
@@ -133,18 +141,22 @@ const createStyles = () => {
       marginBottom: 20,
     },
     periodButton: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 24,
       marginRight: 12,
       backgroundColor: themeColors.lightGray,
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
     },
     selectedPeriodButton: {
       backgroundColor: themeColors.primary,
+      borderColor: themeColors.primary,
     },
     periodButtonText: {
       fontSize: 14,
-      color: themeColors.darkGray,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      fontWeight: '500',
     },
     selectedPeriodButtonText: {
       color: themeColors.white,
@@ -156,8 +168,9 @@ const createStyles = () => {
     },
     updateText: {
       fontSize: 10,
-      color: themeColors.darkGray,
+      color: themeColors.textTertiary || themeColors.darkGray,
       lineHeight: 12,
+      fontWeight: '600',
     },
     chartContainer: {
       marginBottom: 30,
@@ -170,8 +183,8 @@ const createStyles = () => {
     },
     bar: {
       width: 40,
-      backgroundColor: themeColors.secondary,
-      borderRadius: 4,
+      backgroundColor: themeColors.accent || themeColors.secondary,
+      borderRadius: 6,
       marginBottom: 8,
       minHeight: 20,
     },
@@ -183,7 +196,8 @@ const createStyles = () => {
     },
     barMonth: {
       fontSize: 10,
-      color: themeColors.darkGray,
+      color: themeColors.textTertiary || themeColors.darkGray,
+      fontWeight: '500',
     },
     investmentTypesList: {
       marginTop: 20,
@@ -191,9 +205,13 @@ const createStyles = () => {
     investmentTypeRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 16,
+      paddingVertical: 18,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors.mediumGray,
+      borderBottomColor: themeColors.border || themeColors.mediumGray,
+      backgroundColor: themeColors.cardBackground,
+      marginBottom: 8,
+      borderRadius: 12,
+      paddingHorizontal: 16,
     },
     investmentTypeLeft: {
       flexDirection: 'row',
@@ -208,16 +226,19 @@ const createStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 16,
+      borderWidth: 2,
+      borderColor: themeColors.border || themeColors.mediumGray,
     },
     percentageText: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: themeColors.darkGray,
+      color: themeColors.text,
     },
     investmentTypeName: {
       fontSize: 16,
       color: themeColors.text,
-      fontWeight: '500',
+      fontWeight: '600',
+      letterSpacing: -0.1,
     },
   });
 };
