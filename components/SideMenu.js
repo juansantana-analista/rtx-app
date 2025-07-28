@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,22 +7,30 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
-  Animated,
   Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
+import { useUser } from '../hooks/useUser';
 
 const { width } = Dimensions.get('window');
 
 const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
+  const { username, user, refreshUserInfo } = useUser();
+
+  // Atualiza as informações do usuário quando o menu fica visível
+  useEffect(() => {
+    if (isVisible) {
+      refreshUserInfo();
+    }
+  }, [isVisible]);
 
   const menuItems = [
     {
       icon: 'person-outline',
       title: 'Meu Perfil',
-      action: () => console.log('Perfil')
+      action: () => onNavigate('profile')
     },
     {
       icon: 'wallet-outline',
@@ -52,6 +60,21 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
     }
   ];
 
+  // Função para gerar iniciais do nome
+  const getInitials = (name) => {
+    if (!name || name.trim() === '') return 'U';
+    
+    const words = name.trim().split(' ');
+    if (words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
+    }
+    
+    const firstInitial = words[0].charAt(0).toUpperCase();
+    const lastInitial = words[words.length - 1].charAt(0).toUpperCase();
+    
+    return firstInitial + lastInitial;
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -80,14 +103,30 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Informações do Usuário */}
-            <View style={styles.userInfo}>
+            {/* Informações do Usuário - Clicável para ir ao perfil */}
+            <TouchableOpacity 
+              style={styles.userInfo}
+              onPress={() => {
+                onNavigate('profile');
+                onClose();
+              }}
+              activeOpacity={0.7}
+            >
               <View style={[styles.userAvatar, { backgroundColor: themeColors.primary }]}>
-                <Text style={styles.userInitial}>U</Text>
+                <Text style={styles.userInitial}>{getInitials(username)}</Text>
               </View>
-              <Text style={[styles.userName, { color: themeColors.text }]}>Usuário RTX</Text>
-              <Text style={[styles.userEmail, { color: themeColors.textSecondary || themeColors.darkGray }]}>usuario@rtx.com</Text>
-            </View>
+              <Text style={[styles.userName, { color: themeColors.text }]} numberOfLines={2}>
+                {username}
+              </Text>
+              <Text style={[styles.userEmail, { color: themeColors.textSecondary || themeColors.darkGray }]}>
+                {user || 'usuário'}
+              </Text>
+              
+              {/* Indicador de que é clicável */}
+              <View style={styles.profileIndicator}>
+                <Ionicons name="chevron-forward" size={16} color={themeColors.textTertiary || themeColors.darkGray} />
+              </View>
+            </TouchableOpacity>
 
             {/* Linha divisória */}
             <View style={[styles.divider, { backgroundColor: themeColors.border || themeColors.mediumGray }]} />
@@ -197,6 +236,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 24,
+    position: 'relative',
   },
   userAvatar: {
     width: 64,
@@ -221,10 +261,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
     letterSpacing: -0.2,
+    textAlign: 'center',
+    paddingHorizontal: 8,
   },
   userEmail: {
     fontSize: 14,
     fontWeight: '500',
+    textAlign: 'center',
+  },
+  profileIndicator: {
+    position: 'absolute',
+    top: 24,
+    right: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 4,
   },
   divider: {
     height: 1,

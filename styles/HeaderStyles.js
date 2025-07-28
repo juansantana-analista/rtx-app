@@ -1,12 +1,11 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 
 const HEADER_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
-const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight || 24;
 
 export const createHeaderStyles = (themeColors) => StyleSheet.create({
   headerContainer: {
     backgroundColor: themeColors.primary,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    // Remove paddingTop pois será controlado individualmente
   },
   headerContent: {
     height: HEADER_HEIGHT,
@@ -14,6 +13,7 @@ export const createHeaderStyles = (themeColors) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    // paddingTop será adicionado dinamicamente no componente
   },
   headerLeft: {
     width: 40,
@@ -62,7 +62,7 @@ export const createHeaderStyles = (themeColors) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-    backgroundColor: 'rgba(255, 215, 0, 0.2)', // Fundo dourado semi-transparente
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
     borderWidth: 1,
     borderColor: 'rgba(255, 215, 0, 0.3)',
   },

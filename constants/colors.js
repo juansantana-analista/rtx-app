@@ -14,17 +14,22 @@ export const lightColors = {
     error: '#FF4444',      // Vermelho para erros
     background: '#FFFFFF', // Fundo claro
     cardBackground: '#F5F5F5', // Fundo de cards
+    
+    // Cores específicas para Navigation Bar
+    navigationBarBackground: '#FFFFFF', // Fundo da navigation bar (tema claro)
+    navigationBarButtons: 'dark',       // Estilo dos botões (dark/light)
 };
 
 export const darkColors = {
     // Cores principais RTX adaptadas para tema escuro
     primary: '#000000',    // Azul RTX mais escuro
+    blue: '#113334',    // Azul RTX
     secondary: '#4A9B6B',  // Verde RTX levemente mais escuro
     black: '#000000',      // Preto puro
     white: '#FFFFFF',      // Branco puro
     
     // Sistema de cinzas mais moderno baseado na imagem
-    background: '#0F1419', // Fundo principal muito escuro (quase preto)
+    background: '#000000', // Fundo principal muito escuro (quase preto)
     cardBackground: '#1A1F25', // Cards ligeiramente mais claros
     lightGray: '#242A32',  // Cinza para elementos interativos
     mediumGray: '#2D3339', // Cinza médio para bordas
@@ -51,6 +56,10 @@ export const darkColors = {
     // Sobreposições
     overlay: 'rgba(0, 0, 0, 0.7)', // Overlay para modais
     shadow: 'rgba(0, 0, 0, 0.3)',  // Sombras
+    
+    // Cores específicas para Navigation Bar
+    navigationBarBackground: '#0F1419', // Fundo da navigation bar (tema escuro)
+    navigationBarButtons: 'light',      // Estilo dos botões (dark/light)
 };
 
 export const colors = {

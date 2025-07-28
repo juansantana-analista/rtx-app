@@ -104,7 +104,7 @@ const createStyles = () => {
       marginBottom: 20,
     },
     participationCard: {
-      backgroundColor: themeColors.primary,
+      backgroundColor: themeColors.cardBackground,
       borderRadius: 16,
       padding: 24,
       flexDirection: 'row',

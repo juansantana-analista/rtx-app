@@ -1,14 +1,11 @@
-import api from './api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from './api';
 
 const TOKEN_KEY = '@RTX:authToken';
 
 export const storeToken = async (token) => {
   try {
-    console.log('Armazenando token:', token);
     await AsyncStorage.setItem(TOKEN_KEY, token);
-    const storedToken = await AsyncStorage.getItem(TOKEN_KEY);
-    console.log('Token armazenado com sucesso:', storedToken === token);
     return true;
   } catch (error) {
     console.error('Error storing token:', error);
@@ -35,27 +32,22 @@ export const removeToken = async () => {
 
 export const login = async (credentials) => {
   try {
-    console.log('Tentando login com:', credentials);
+    const authToken = 'Bearer Q0xJRU5UX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ=';
+    
     const response = await api.post('/auth_app_homolog.php', {
       userDoc: credentials.userDoc,
       userPassword: credentials.password
     }, {
       headers: {
-        'Authorization': 'Bearer Q0xJRU5FX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ=',
-        'Content-Type': 'application/json'
-      },
-      validateStatus: (status) => status < 500 // Aceita status codes menores que 500
+        'Authorization': authToken,
+        'authorization': authToken,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
     });
     
-    console.log('Status da resposta:', response.status);
-    console.log('Resposta do servidor:', response.data);
-
-    // Retorna o objeto completo da resposta para tratamento no componente
     return response.data;
   } catch (error) {
-    console.error('Erro na requisição:', error);
-    
-    // Se houve erro de rede ou timeout
     if (error.code === 'NETWORK_ERROR' || error.code === 'ECONNABORTED') {
       return {
         status: 'error',
@@ -63,13 +55,10 @@ export const login = async (credentials) => {
       };
     }
     
-    // Se a resposta tem dados (erro HTTP)
     if (error.response && error.response.data) {
-      console.log('Dados do erro:', error.response.data);
       return error.response.data;
     }
     
-    // Erro genérico
     return {
       status: 'error',
       data: 'Erro de conexão com o servidor',

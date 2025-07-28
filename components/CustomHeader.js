@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, Image, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, Image, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import { createHeaderStyles } from '../styles/HeaderStyles';
@@ -11,7 +11,7 @@ const CustomHeader = ({
   rightActions = [], 
   showLogo = false,
   logoHeight = 120,
-  showCenteredLogo = false // Nova prop para mostrar logo centralizado
+  showCenteredLogo = false
 }) => {
   const { themeColors } = useTheme();
   const headerStyles = createHeaderStyles(themeColors);
@@ -25,7 +25,11 @@ const CustomHeader = ({
           translucent={false} 
         />
         <SafeAreaView style={[headerStyles.headerContainer, { paddingBottom: 20 }]}>
-          <View style={[headerStyles.headerContent, { height: logoHeight, paddingTop: 20 }]}>
+          <View style={[headerStyles.headerContent, { 
+            height: logoHeight, 
+            paddingTop: Platform.OS === 'ios' ? 10 : 15, // Reduzido o padding
+            justifyContent: 'center' 
+          }]}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Image 
                 source={require('../assets/logortx.png')} 
@@ -47,7 +51,9 @@ const CustomHeader = ({
         translucent={false} 
       />
       <SafeAreaView style={headerStyles.headerContainer}>
-        <View style={headerStyles.headerContent}>
+        <View style={[headerStyles.headerContent, {
+          paddingTop: Platform.OS === 'ios' ? 0 : 5 // Padding mínimo
+        }]}>
           <View style={headerStyles.headerLeft}>
             {leftIcon && leftAction && (
               <TouchableOpacity 
@@ -82,7 +88,6 @@ const CustomHeader = ({
                 key={index}
                 style={[
                   headerStyles.headerActionButton,
-                  // Destaque especial para o botão de tema
                   (action.icon === 'sunny-outline' || action.icon === 'moon-outline') && {
                     backgroundColor: 'rgba(255, 255, 255, 0.15)',
                   }
@@ -95,9 +100,8 @@ const CustomHeader = ({
                   size={18} 
                   style={[
                     headerStyles.headerIcon,
-                    // Cor especial para ícones de tema
                     (action.icon === 'sunny-outline' || action.icon === 'moon-outline') && {
-                      color: '#FFD700' // Dourado para sol/lua
+                      color: '#FFD700'
                     }
                   ]} 
                 />

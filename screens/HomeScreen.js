@@ -13,7 +13,7 @@ import CustomHeader from '../components/CustomHeader';
 import SideMenu from '../components/SideMenu';
 import createStyles from '../styles/HomeStyles';
 
-const HomeScreen = ({ onWallet, onLogout }) => {
+const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
   const styles = createStyles();
   const [balance] = useState('R$ 180.250,00');
@@ -43,10 +43,51 @@ const HomeScreen = ({ onWallet, onLogout }) => {
   ];
 
   const handleMenuNavigation = (screen) => {
-    if (screen === 'wallet') {
-      onWallet();
+    console.log('Navegando para:', screen);
+    
+    switch (screen) {
+      case 'wallet':
+        if (onWallet && typeof onWallet === 'function') {
+          onWallet();
+        }
+        break;
+      case 'profile':
+        if (onProfile && typeof onProfile === 'function') {
+          onProfile();
+        }
+        break;
+      default:
+        if (onNavigate && typeof onNavigate === 'function') {
+          onNavigate(screen);
+        }
+        break;
     }
+    
     setIsMenuVisible(false);
+  };
+
+  const handleWalletPress = () => {
+    if (onWallet && typeof onWallet === 'function') {
+      onWallet();
+    } else {
+      console.warn('onWallet function not provided');
+    }
+  };
+
+  const handleProfilePress = () => {
+    if (onProfile && typeof onProfile === 'function') {
+      onProfile();
+    } else {
+      console.warn('onProfile function not provided');
+    }
+  };
+
+  const handleLogoutPress = () => {
+    if (onLogout && typeof onLogout === 'function') {
+      onLogout();
+    } else {
+      console.warn('onLogout function not provided');
+    }
   };
 
   return (
@@ -62,7 +103,7 @@ const HomeScreen = ({ onWallet, onLogout }) => {
       <SideMenu
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
-        onLogout={onLogout}
+        onLogout={handleLogoutPress}
         onNavigate={handleMenuNavigation}
       />
 
@@ -81,7 +122,7 @@ const HomeScreen = ({ onWallet, onLogout }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity style={styles.accessWallet} onPress={onWallet}>
+          <TouchableOpacity style={styles.accessWallet} onPress={handleWalletPress}>
             <Text style={styles.accessWalletText}>Acessar carteira</Text>
           </TouchableOpacity>
         </View>
@@ -146,7 +187,7 @@ const HomeScreen = ({ onWallet, onLogout }) => {
             <Ionicons name="home" size={24} color={themeColors.secondary} />
             <Text style={[styles.navText, styles.activeNavText]}>Início</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={onWallet}>
+          <TouchableOpacity style={styles.navItem} onPress={handleWalletPress}>
             <Ionicons name="wallet" size={24} color={themeColors.darkGray} />
             <Text style={styles.navText}>Carteira</Text>
           </TouchableOpacity>
@@ -158,7 +199,7 @@ const HomeScreen = ({ onWallet, onLogout }) => {
             <Ionicons name="bag" size={24} color={themeColors.darkGray} />
             <Text style={styles.navText}>Shop</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
+          <TouchableOpacity style={styles.navItem} onPress={handleProfilePress}>
             <Ionicons name="person" size={24} color={themeColors.darkGray} />
             <Text style={styles.navText}>Meu perfil</Text>
           </TouchableOpacity>
