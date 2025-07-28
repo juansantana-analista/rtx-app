@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
 import createStyles from '../styles/WalletStyles';
 
 const WalletScreen = ({ onBack }) => {
@@ -36,33 +36,19 @@ const WalletScreen = ({ onBack }) => {
     { title: 'ABSOLUTE', percentage: 2 },
   ];
 
+  const rightActions = [
+    { icon: 'refresh-outline', onPress: () => console.log('Refresh') },
+    { icon: 'eye-outline', onPress: () => console.log('Toggle visibility') }
+  ];
+
   return (
     <View style={styles.container}>
-      <StatusBar 
-        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} 
-        backgroundColor={themeColors.primary} 
-        translucent={false} 
+      <CustomHeader 
+        title="Carteira"
+        leftIcon="arrow-back"
+        leftAction={onBack}
+        rightActions={rightActions}
       />
-      
-      {/* Header Fixo */}
-      <SafeAreaView style={styles.headerSafeArea}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity onPress={onBack} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={themeColors.white} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Carteira</Text>
-            <View style={styles.headerActions}>
-              <TouchableOpacity style={styles.headerIcon}>
-                <Ionicons name="refresh" size={20} style={styles.headerIconColor} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.headerIcon}>
-                <Ionicons name="eye" size={20} style={styles.headerIconColor} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </SafeAreaView>
 
       {/* Conteúdo Rolável */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

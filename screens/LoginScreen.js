@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   Dimensions,
   Alert,
-  Image
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
+import { login } from '../services/authService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,7 +24,8 @@ const LoginScreen = ({ onLogin }) => {
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
 
   const formatCPF = (text) => {
     const numbers = text.replace(/\D/g, '');
@@ -33,11 +35,35 @@ const LoginScreen = ({ onLogin }) => {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    setLoginError('');
+    
     if (cpf.replace(/\D/g, '').length === 11 && password.length >= 4) {
-      onLogin();
+      setIsLoading(true);
+      try {
+        const response = await login({
+          userDoc: cpf.replace(/\D/g, ''),
+          password: password
+        });
+        
+        if (response.status === 'success') {
+          console.log('Token recebido:', response.data);
+          const stored = await storeToken(response.data);
+          if (stored) {
+            onLogin();
+          } else {
+            setLoginError('Falha ao armazenar token');
+          }
+        } else {
+          setLoginError(response.data || 'Credenciais inválidas');
+        }
+      } catch (error) {
+        setLoginError('Erro de conexão com o servidor');
+      } finally {
+        setIsLoading(false);
+      }
     } else {
-      Alert.alert('Erro', 'CPF deve ter 11 dígitos e senha pelo menos 4 caracteres');
+      setLoginError('CPF deve ter 11 dígitos e senha pelo menos 4 caracteres');
     }
   };
 
@@ -45,19 +71,7 @@ const LoginScreen = ({ onLogin }) => {
   
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themeColors.primary} translucent={false} />
-      
-      <SafeAreaView style={styles.headerSafeArea}>
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/logortx.png')} 
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
-      </SafeAreaView>
+      <CustomHeader showLogo={true} logoHeight={140} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
@@ -107,9 +121,21 @@ const LoginScreen = ({ onLogin }) => {
             <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
+          <TouchableOpacity 
+            style={styles.loginButton} 
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
+
+          {loginError ? (
+            <Text style={styles.errorText}>{loginError}</Text>
+          ) : null}
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />

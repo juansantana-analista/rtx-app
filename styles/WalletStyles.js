@@ -9,36 +9,6 @@ const createStyles = () => {
       flex: 1,
       backgroundColor: themeColors.background,
     },
-    headerSafeArea: {
-      backgroundColor: themeColors.primary,
-    },
-    header: {
-      backgroundColor: themeColors.primary,
-      paddingHorizontal: 20,
-      paddingTop: 10,
-      paddingBottom: 20,
-    },
-    headerContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      minHeight: 44,
-    },
-    backButton: {
-      padding: 8,
-      marginLeft: -8,
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: themeColors.white,
-    },
-    headerActions: {
-      flexDirection: 'row',
-    },
-    headerIcon: {
-      marginLeft: 16,
-    },
     content: {
       flex: 1,
       backgroundColor: themeColors.background,

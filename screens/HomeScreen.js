@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
 import createStyles from '../styles/HomeStyles';
 
 const HomeScreen = ({ onWallet, onLogout }) => {
@@ -29,33 +29,25 @@ const HomeScreen = ({ onWallet, onLogout }) => {
     { title: 'Renda Fixa Isenta', subtitle: 'Vence em 3 anos', yield: '95% do CDI' },
   ];
 
+  const rightActions = [
+    { 
+      icon: theme === 'dark' ? 'sunny-outline' : 'moon-outline', 
+      onPress: toggleTheme 
+    },
+    { 
+      icon: 'eye-outline', 
+      onPress: () => console.log('Toggle visibility') 
+    }
+  ];
+
   return (
     <View style={styles.container}>
-      <StatusBar 
-        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} 
-        backgroundColor={themeColors.primary} 
-        translucent={false} 
+      <CustomHeader 
+        title="Investimentos"
+        leftIcon="log-out-outline"
+        leftAction={onLogout}
+        rightActions={rightActions}
       />
-      
-      {/* Header Fixo */}
-      <SafeAreaView style={styles.headerSafeArea}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
-              <Ionicons name="log-out" size={24} color={themeColors.white} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Investimentos</Text>
-            <View style={styles.headerActions}>
-              <TouchableOpacity style={styles.headerIcon}>
-                <Ionicons name="refresh" size={20} style={styles.headerIconColor} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.headerIcon}>
-                <Ionicons name="eye" size={20} style={styles.headerIconColor} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </SafeAreaView>
 
       {/* Conteúdo Rolável */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

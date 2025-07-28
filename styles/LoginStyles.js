@@ -5,24 +5,6 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
     flex: 1,
     backgroundColor: themeColors.background
   },
-  headerSafeArea: {
-    backgroundColor: themeColors.primary,
-  },
-  header: {
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-  },
-  logoImage: {
-    width: 280,
-    height: 80,
-  },
   content: {
     flex: 1,
     borderTopLeftRadius: 24,
@@ -102,9 +84,15 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
     backgroundColor: themeColors.secondary
   },
   loginButtonText: {
-    color: 'white',
+    color: themeColors.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: themeColors.error,
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 10,
   },
   divider: {
     flexDirection: 'row',
