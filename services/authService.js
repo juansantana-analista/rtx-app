@@ -44,18 +44,35 @@ export const login = async (credentials) => {
         'Authorization': 'Bearer Q0xJRU5FX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ=',
         'Content-Type': 'application/json'
       },
-      validateStatus: (status) => status < 500
+      validateStatus: (status) => status < 500 // Aceita status codes menores que 500
     });
+    
+    console.log('Status da resposta:', response.status);
     console.log('Resposta do servidor:', response.data);
 
     // Retorna o objeto completo da resposta para tratamento no componente
     return response.data;
   } catch (error) {
     console.error('Erro na requisição:', error);
+    
+    // Se houve erro de rede ou timeout
+    if (error.code === 'NETWORK_ERROR' || error.code === 'ECONNABORTED') {
+      return {
+        status: 'error',
+        data: 'Erro de conexão. Verifique sua internet.',
+      };
+    }
+    
+    // Se a resposta tem dados (erro HTTP)
+    if (error.response && error.response.data) {
+      console.log('Dados do erro:', error.response.data);
+      return error.response.data;
+    }
+    
+    // Erro genérico
     return {
       status: 'error',
-      message: 'Erro de conexão com o servidor',
-      data: null
+      data: 'Erro de conexão com o servidor',
     };
   }
 };

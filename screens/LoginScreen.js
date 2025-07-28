@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import CustomHeader from '../components/CustomHeader';
-import { login } from '../services/authService';
+import { login, storeToken } from '../services/authService'; // Importar storeToken
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,23 +41,40 @@ const LoginScreen = ({ onLogin }) => {
     if (cpf.replace(/\D/g, '').length === 11 && password.length >= 4) {
       setIsLoading(true);
       try {
+        console.log('Iniciando login...');
         const response = await login({
           userDoc: cpf.replace(/\D/g, ''),
           password: password
         });
         
+        console.log('Resposta completa da API:', response);
+        
         if (response.status === 'success') {
-          console.log('Token recebido:', response.data);
-          const stored = await storeToken(response.data);
-          if (stored) {
-            onLogin();
+          console.log('Login bem-sucedido! Token recebido:', response.data);
+          
+          // Armazenar o token
+          const tokenStored = await storeToken(response.data);
+          
+          if (tokenStored) {
+            console.log('Token armazenado com sucesso, redirecionando...');
+            onLogin(); // Chama a função para navegar para a tela home
           } else {
-            setLoginError('Falha ao armazenar token');
+            console.error('Falha ao armazenar token');
+            setLoginError('Falha interna - tente novamente');
           }
-        } else {
+        } else if (response.status === 'error') {
+          console.log('Erro de login:', response.data);
           setLoginError(response.data || 'Credenciais inválidas');
+        } else if (response.error) {
+          // Para casos como "Usuário e senha são obrigatórios"
+          console.log('Erro de validação:', response.error);
+          setLoginError(response.error);
+        } else {
+          console.log('Resposta inesperada:', response);
+          setLoginError('Resposta inesperada do servidor');
         }
       } catch (error) {
+        console.error('Erro na requisição de login:', error);
         setLoginError('Erro de conexão com o servidor');
       } finally {
         setIsLoading(false);
