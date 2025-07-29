@@ -34,29 +34,75 @@ export const login = async (credentials) => {
   try {
     const authToken = 'Bearer Q0xJRU5UX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ=';
     
-    const response = await api.post('/auth_app_homolog.php', {
-      userDoc: credentials.userDoc,
-      userPassword: credentials.password
-    }, {
+    // Teste com fetch diretamente para evitar problemas do axios
+    const url = 'https://rtx.tecskill.com.br/auth_app_homolog.php';
+    
+    // Teste de conectividade primeiro
+    const isConnected = await testApiConnection();
+    if (!isConnected) {
+      return {
+        status: 'error',
+        data: 'Não foi possível conectar ao servidor. Verifique sua internet.',
+      };
+    }
+    
+    // Criar um timeout para a requisição
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
+    
+    const response = await fetch(url, {
+      method: 'POST',
       headers: {
         'Authorization': authToken,
         'authorization': authToken,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        userDoc: credentials.userDoc,
+        userPassword: credentials.password
+      }),
+      signal: controller.signal
     });
     
-    return response.data;
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
   } catch (error) {
-    if (error.code === 'NETWORK_ERROR' || error.code === 'ECONNABORTED') {
+    console.error('Erro na requisição de login:', error);
+    
+    // Tratamento específico para diferentes tipos de erro
+    if (error.name === 'AbortError') {
       return {
         status: 'error',
-        data: 'Erro de conexão. Verifique sua internet.',
+        data: 'Timeout da requisição. Tente novamente.',
       };
     }
     
-    if (error.response && error.response.data) {
-      return error.response.data;
+    if (error.message && error.message.includes('Network request failed')) {
+      return {
+        status: 'error',
+        data: 'Erro de conexão. Verifique sua internet e tente novamente.',
+      };
+    }
+    
+    if (error.message && error.message.includes('HTTP error')) {
+      return {
+        status: 'error',
+        data: `Erro do servidor: ${error.message}`,
+      };
+    }
+    
+    if (error.message) {
+      return {
+        status: 'error',
+        data: error.message,
+      };
     }
     
     return {
@@ -76,5 +122,32 @@ export const validateToken = async (token) => {
     return response.data;
   } catch (error) {
     throw error;
+  }
+};
+
+// Função para criar uma instância do axios com token automaticamente
+export const createAuthenticatedApi = async () => {
+  const token = await getToken();
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  return api;
+};
+
+// Função para testar conectividade com a API
+export const testApiConnection = async () => {
+  try {
+    const url = 'https://rtx.tecskill.com.br/auth_app_homolog.php';
+    
+    const response = await fetch(url, {
+      method: 'OPTIONS', // Teste simples de conectividade
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.ok;
+  } catch (error) {
+    return false;
   }
 };

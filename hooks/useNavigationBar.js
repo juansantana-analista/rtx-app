@@ -23,7 +23,6 @@ export const useNavigationBar = (theme, themeColors) => {
 
           await NavigationBar.setButtonStyleAsync(buttonStyle);
 
-          console.log(`Navigation Bar configurada: ${backgroundColor} - ${buttonStyle}`);
         } catch (error) {
           console.error('Erro ao configurar Navigation Bar:', error);
         }

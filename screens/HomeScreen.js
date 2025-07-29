@@ -1,23 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
+import { useAuth } from '../constants/AuthContext';
+import { apiRequest } from '../services/api';
 import CustomHeader from '../components/CustomHeader';
-import SideMenu from '../components/SideMenu';
+import FloatingBottomNav from '../components/FloatingBottomNav';
 import createStyles from '../styles/HomeStyles';
+import createFloatingNavStyles from '../styles/FloatingBottomNavStyles';
 
-const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
+const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, showFloatingNav = true, showSideMenu = true }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth();
   const styles = createStyles();
-  const [balance] = useState('R$ 180.250,00');
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const floatingStyles = createFloatingNavStyles({ ...themeColors, theme });
+  const [balance, setBalance] = useState(null);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+  const [activeTab, setActiveTab] = useState('home');
+  const [isBalanceVisible, setIsBalanceVisible] = useState(false);
+  const [balanceError, setBalanceError] = useState('');
+
+  const fetchBalance = async () => {
+    if (!isAuthenticated || !user?.id) {
+      setBalance(null);
+      setBalanceError('');
+      setIsLoadingBalance(false);
+      return;
+    }
+    setIsLoadingBalance(true);
+    setBalanceError('');
+    try {
+      const result = await apiRequest({
+        classe: 'CarteiraRestService',
+        metodo: 'getCarteirasUsuario',
+        params: { usuario_id: user.id }
+      });
+      if (result.status === 'success' && result.data && result.data.length > 0) {
+        setBalance(result.data[0].saldo);
+      } else {
+        setBalance('0');
+        setBalanceError('Saldo não encontrado');
+      }
+    } catch (e) {
+      setBalanceError(e.message || 'Erro ao buscar saldo');
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [user, isAuthenticated]);
+
+  const handleRefreshBalance = () => {
+    fetchBalance();
+  };
 
   const menuItems = [
     { id: 1, title: 'Calculadora de Câmbio', icon: 'calculator' },
@@ -42,31 +85,10 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
     }
   ];
 
-  const handleMenuNavigation = (screen) => {
-    console.log('Navegando para:', screen);
-    
-    switch (screen) {
-      case 'wallet':
-        if (onWallet && typeof onWallet === 'function') {
-          onWallet();
-        }
-        break;
-      case 'profile':
-        if (onProfile && typeof onProfile === 'function') {
-          onProfile();
-        }
-        break;
-      default:
-        if (onNavigate && typeof onNavigate === 'function') {
-          onNavigate(screen);
-        }
-        break;
-    }
-    
-    setIsMenuVisible(false);
-  };
+
 
   const handleWalletPress = () => {
+    setActiveTab('wallet');
     if (onWallet && typeof onWallet === 'function') {
       onWallet();
     } else {
@@ -75,10 +97,28 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
   };
 
   const handleProfilePress = () => {
+    setActiveTab('profile');
     if (onProfile && typeof onProfile === 'function') {
       onProfile();
     } else {
       console.warn('onProfile function not provided');
+    }
+  };
+
+  const handleTabPress = (tabId) => {
+    setActiveTab(tabId);
+    console.log('Tab selecionada:', tabId);
+    
+    // Aqui você pode adicionar navegação para outras telas se necessário
+    switch (tabId) {
+      case 'investment':
+        console.log('Navegar para investimentos');
+        break;
+      case 'shop':
+        console.log('Navegar para shop');
+        break;
+      default:
+        break;
     }
   };
 
@@ -95,33 +135,38 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
       <CustomHeader 
         showCenteredLogo={true}
         leftIcon="menu-outline"
-        leftAction={() => setIsMenuVisible(true)}
+        leftAction={onOpenMenu}
         rightActions={rightActions}
       />
 
-      {/* Menu Lateral */}
-      <SideMenu
-        isVisible={isMenuVisible}
-        onClose={() => setIsMenuVisible(false)}
-        onLogout={handleLogoutPress}
-        onNavigate={handleMenuNavigation}
-      />
+
 
       {/* Conteúdo Rolável */}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }} // Espaço para o nav flutuante
+      >
         {/* Card de Saldo */}
         <View style={styles.balanceCard}>
-          <View style={styles.balanceHeader}>
-            <Text style={styles.balanceAmount}>{balance}</Text>
-            <View style={styles.balanceActions}>
-              <TouchableOpacity>
-                <Ionicons name="refresh" size={20} color={themeColors.secondary} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Ionicons name="eye" size={20} color={themeColors.secondary} />
-              </TouchableOpacity>
-            </View>
-          </View>
+                     <View style={styles.balanceHeader}>
+             <Text style={styles.balanceAmount}>
+               {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
+             </Text>
+             {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
+             <View style={styles.balanceActions}>
+               <TouchableOpacity onPress={handleRefreshBalance}>
+                 <Ionicons name="refresh" size={20} color={themeColors.secondary} />
+               </TouchableOpacity>
+               <TouchableOpacity onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
+                 <Ionicons 
+                   name={isBalanceVisible ? "eye-off" : "eye"} 
+                   size={20} 
+                   color={themeColors.secondary} 
+                 />
+               </TouchableOpacity>
+             </View>
+           </View>
           <TouchableOpacity style={styles.accessWallet} onPress={handleWalletPress}>
             <Text style={styles.accessWalletText}>Acessar carteira</Text>
           </TouchableOpacity>
@@ -160,7 +205,6 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
               <Text style={styles.calendarIcon}>📅</Text>
             </View>
           </View>
-
         </View>
 
         {/* Oportunidades do Dia */}
@@ -178,33 +222,20 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate }) => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Espaçamento para o nav flutuante */}
+        <View style={floatingStyles.bottomSpacing} />
       </ScrollView>
 
-      {/* Navegação Inferior */}
-      <SafeAreaView style={styles.bottomNavSafeArea}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <Ionicons name="home" size={24} color={themeColors.secondary} />
-            <Text style={[styles.navText, styles.activeNavText]}>Início</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={handleWalletPress}>
-            <Ionicons name="wallet" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Carteira</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="trending-up" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Investimento</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="bag" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Shop</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={handleProfilePress}>
-            <Ionicons name="person" size={24} color={themeColors.darkGray} />
-            <Text style={styles.navText}>Meu perfil</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+             {/* Navigation Bar Flutuante - apenas se showFloatingNav for true */}
+       {showFloatingNav && (
+         <FloatingBottomNav
+           activeTab={activeTab}
+           onTabPress={handleTabPress}
+           onWalletPress={handleWalletPress}
+           onProfilePress={handleProfilePress}
+         />
+       )}
     </View>
   );
 };

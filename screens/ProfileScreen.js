@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
-import { useUser } from '../hooks/useUser';
+import { useAuth } from '../constants/AuthContext';
 import CustomHeader from '../components/CustomHeader';
 import createStyles from '../styles/ProfileStyles';
 
-const ProfileScreen = ({ onBack, onLogout }) => {
+const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
-  const { username, user, usermail, isAuthenticated } = useUser();
+  const { user, logout } = useAuth();
   const styles = createStyles();
 
   // Função para gerar iniciais do nome
@@ -108,7 +108,7 @@ const ProfileScreen = ({ onBack, onLogout }) => {
           'Tem certeza que deseja sair?',
           [
             { text: 'Cancelar', style: 'cancel' },
-            { text: 'Sair', style: 'destructive', onPress: onLogout }
+            { text: 'Sair', style: 'destructive', onPress: logout }
           ]
         );
       },
@@ -136,15 +136,15 @@ const ProfileScreen = ({ onBack, onLogout }) => {
         {/* Card do Perfil */}
         <View style={styles.profileCard}>
           <View style={styles.profileInfo}>
-            <View style={[styles.profileAvatar, { backgroundColor: themeColors.primary }]}>
-              <Text style={styles.profileInitials}>{getInitials(username)}</Text>
-            </View>
-            
-            <View style={styles.profileDetails}>
-              <Text style={styles.profileName}>{username}</Text>
-              <Text style={styles.profileEmail}>{usermail || user}</Text>
-              <Text style={styles.profileId}>ID: {user}</Text>
-            </View>
+                         <View style={[styles.profileAvatar, { backgroundColor: themeColors.primary }]}>
+               <Text style={styles.profileInitials}>{getInitials(user?.name || 'Usuário')}</Text>
+             </View>
+             
+             <View style={styles.profileDetails}>
+               <Text style={styles.profileName}>{user?.name || 'Usuário'}</Text>
+               <Text style={styles.profileEmail}>{user?.cpf || '000.000.000-00'}</Text>
+               <Text style={styles.profileId}>{user?.email || 'email@rtx.com'}</Text>
+             </View>
           </View>
 
           <TouchableOpacity style={styles.editProfileButton}>

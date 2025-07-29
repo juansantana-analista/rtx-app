@@ -207,45 +207,6 @@ const createStyles = () => {
       marginTop: 10,
       borderRadius: 2,
     },
-    bottomNavSafeArea: {
-      backgroundColor: themeColors.cardBackground,
-    },
-    bottomNav: {
-      flexDirection: 'row',
-      backgroundColor: themeColors.cardBackground,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      borderTopWidth: 1,
-      borderTopColor: themeColors.border || themeColors.mediumGray,
-    },
-    navItem: {
-      flex: 1,
-      alignItems: 'center',
-      paddingVertical: 8,
-      position: 'relative',
-    },
-    activeNavItem: {
-      // Estilo para item ativo
-    },
-    navText: {
-      fontSize: 12,
-      color: themeColors.textTertiary || themeColors.darkGray,
-      marginTop: 4,
-      fontWeight: '500',
-    },
-    activeNavText: {
-      color: themeColors.accent || themeColors.secondary,
-      fontWeight: 'bold',
-    },
-    notificationDot: {
-      position: 'absolute',
-      top: 4,
-      right: '35%',
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: themeColors.error,
-    },
   });
 };
 

@@ -30,8 +30,18 @@ const createStyles = () => {
       fontSize: 32,
       fontWeight: 'bold',
       color: themeColors.text,
-      marginBottom: 24,
       letterSpacing: -0.5,
+    },
+    balanceHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    balanceVisibilityButton: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
     },
     investmentBreakdown: {
       marginBottom: 24,

@@ -1,49 +1,76 @@
 import axios from 'axios';
-import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { forceGlobalLogout } from './globalLogout';
 
+// Configuração base do axios
 const api = axios.create({
   baseURL: 'https://rtx.tecskill.com.br',
-  timeout: 15000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'User-Agent': `RTX-Mobile-App/1.0.0 (${Platform.OS})`,
-    'X-Requested-With': 'XMLHttpRequest',
-    'Authorization': 'Bearer Q0xJRU5UX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ='
+    'Accept': 'application/json'
   }
 });
 
-// Interceptor para garantir que o token esteja sempre presente
-api.interceptors.request.use(
-  config => {
-    const token = 'Bearer Q0xJRU5UX0lEkKUDHAS5514DSYUdftOkVF9TRUNSRVQ=';
-    config.headers['Authorization'] = token;
-    config.headers['authorization'] = token;
-    return config;
+// Interceptor para tratar respostas
+api.interceptors.response.use(
+  (response) => {
+    return response;
   },
-  error => {
+  async (error) => {
+    // Se receber 401 (Unauthorized), pode ser que o token expirou
+    if (error.response && error.response.status === 401) {
+      console.log('Token expirado ou inválido');
+      // Aqui você pode implementar refresh token ou logout automático
+    }
+    
     return Promise.reject(error);
   }
 );
 
-// Interceptor para tratamento global de erros
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          console.error('Não autorizado');
-          break;
-        case 500:
-          console.error('Erro no servidor');
-          break;
-        default:
-          console.error('Erro na requisição');
-      }
-    }
-    return Promise.reject(error);
+const API_URL = 'https://rtx.tecskill.com.br/rest.php';
+
+/**
+ * Função genérica para requisições autenticadas à API RTX
+ * @param {Object} options
+ * @param {string} options.classe - Nome da classe do backend
+ * @param {string} options.metodo - Nome do método do backend
+ * @param {Object} options.params - Parâmetros adicionais
+ * @returns {Promise<Object>} - Resposta da API
+ */
+export async function apiRequest({ classe, metodo, params = {} }) {
+  // Recupera o token JWT salvo
+  const token = await AsyncStorage.getItem('@RTX:authToken');
+  if (!token) {
+    throw new Error('Token não encontrado. Faça login novamente.');
   }
-);
+
+  // Monta o body
+  const body = {
+    class: classe,
+    method: metodo,
+    ...params
+  };
+
+  // Faz a requisição
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await response.json();
+
+  // Se o JWT for inválido, pode tratar aqui
+  if (data.status === 'error' && data.data && typeof data.data === 'string' && data.data.includes('Signature verification failed')) {
+    forceGlobalLogout();
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
+
+  return data;
+}
 
 export default api;

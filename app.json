@@ -29,10 +29,17 @@
       "navigationBar": {
         "backgroundColor": "#0F1419",
         "barStyle": "light-content"
-      }
+      },
+      "package": "com.juansantana.analista.RTXAPP"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f53c4dd5-2c9a-49a8-8fc6-8ecfc88ec3fa"
+      }
+    },
+    "owner": "juansantana.analista"
   }
 }

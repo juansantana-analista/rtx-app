@@ -33,7 +33,7 @@ const CustomHeader = ({
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Image 
                 source={require('../assets/logortx.png')} 
-                style={{ width: 240, height: 60 }}
+                style={{ width: 280, height: 70 }}
                 resizeMode="contain"
               />
             </View>
@@ -74,7 +74,7 @@ const CustomHeader = ({
             {showCenteredLogo ? (
               <Image 
                 source={require('../assets/rtx-x-color.png')} 
-                style={{ width: 120, height: 30 }}
+                style={{ width: 140, height: 35 }}
                 resizeMode="contain"
               />
             ) : (

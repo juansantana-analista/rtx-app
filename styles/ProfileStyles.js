@@ -159,51 +159,6 @@ const createStyles = () => {
       color: themeColors.textTertiary || themeColors.darkGray,
       fontWeight: '400',
     },
-    // Estilos para estados especiais
-    themeOption: {
-      backgroundColor: 'rgba(255, 215, 0, 0.05)',
-      borderColor: 'rgba(255, 215, 0, 0.2)',
-    },
-    logoutOption: {
-      backgroundColor: 'rgba(255, 68, 68, 0.05)',
-      borderColor: 'rgba(255, 68, 68, 0.2)',
-    },
-    // Estilos responsivos
-    profileCardSmall: {
-      margin: 16,
-      padding: 20,
-    },
-    profileAvatarSmall: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-    },
-    profileInitialsSmall: {
-      fontSize: 24,
-    },
-    profileNameSmall: {
-      fontSize: 20,
-    },
-    // Estados de interação
-    optionItemPressed: {
-      backgroundColor: themeColors.lightGray,
-      transform: [{ scale: 0.98 }],
-    },
-    // Badge para novidades
-    badge: {
-      position: 'absolute',
-      top: 8,
-      right: 8,
-      backgroundColor: themeColors.accent || themeColors.secondary,
-      borderRadius: 10,
-      paddingHorizontal: 8,
-      paddingVertical: 3,
-    },
-    badgeText: {
-      fontSize: 10,
-      color: themeColors.white,
-      fontWeight: 'bold',
-    },
   });
 };
 

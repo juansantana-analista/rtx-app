@@ -11,20 +11,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
-import { useUser } from '../hooks/useUser';
+import { useAuth } from '../constants/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
-  const { username, user, refreshUserInfo } = useUser();
+  const { user, logout } = useAuth();
 
-  // Atualiza as informações do usuário quando o menu fica visível
-  useEffect(() => {
-    if (isVisible) {
-      refreshUserInfo();
-    }
-  }, [isVisible]);
+
 
   const menuItems = [
     {
@@ -55,7 +50,7 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
     {
       icon: 'log-out-outline',
       title: 'Sair',
-      action: onLogout,
+      action: logout,
       isLogout: true
     }
   ];
@@ -112,15 +107,15 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
               }}
               activeOpacity={0.7}
             >
-              <View style={[styles.userAvatar, { backgroundColor: themeColors.primary }]}>
-                <Text style={styles.userInitial}>{getInitials(username)}</Text>
-              </View>
-              <Text style={[styles.userName, { color: themeColors.text }]} numberOfLines={2}>
-                {username}
-              </Text>
-              <Text style={[styles.userEmail, { color: themeColors.textSecondary || themeColors.darkGray }]}>
-                {user || 'usuário'}
-              </Text>
+                             <View style={[styles.userAvatar, { backgroundColor: themeColors.primary }]}>
+                 <Text style={styles.userInitial}>{getInitials(user?.name || 'Usuário')}</Text>
+               </View>
+               <Text style={[styles.userName, { color: themeColors.text }]} numberOfLines={2}>
+                 {user?.name || 'Usuário'}
+               </Text>
+               <Text style={[styles.userEmail, { color: themeColors.textSecondary || themeColors.darkGray }]}>
+                 {user?.cpf || '000.000.000-00'}
+               </Text>
               
               {/* Indicador de que é clicável */}
               <View style={styles.profileIndicator}>

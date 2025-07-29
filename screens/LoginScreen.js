@@ -15,51 +15,63 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import CustomHeader from '../components/CustomHeader';
-import { login, storeToken } from '../services/authService';
+import { useAuth } from '../constants/AuthContext';
+import * as LocalAuthentication from 'expo-local-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
-const LoginScreen = ({ onLogin }) => {
+const LOGIN_DATA_KEY = '@RTX:loginData';
+
+const LoginScreen = () => {
   const { themeColors } = useTheme();
-  const [cpf, setCpf] = useState('');
+  const { login } = useAuth();
+  const [documento, setDocumento] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  const formatCPF = (text) => {
+  const formatDocumento = (text) => {
     const numbers = text.replace(/\D/g, '');
     if (numbers.length <= 11) {
-      const formatted = numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-      setCpf(formatted);
+      // CPF: 000.000.000-00
+      const formatted = numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (match, p1, p2, p3, p4) => {
+        let result = `${p1}.${p2}.${p3}`;
+        if (p4) result += `-${p4}`;
+        return result;
+      });
+      setDocumento(formatted);
+    } else if (numbers.length <= 14) {
+      // CNPJ: 00.000.000/0000-00
+      const formatted = numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, (match, p1, p2, p3, p4, p5) => {
+        let result = `${p1}.${p2}.${p3}/${p4}`;
+        if (p5) result += `-${p5}`;
+        return result;
+      });
+      setDocumento(formatted);
     }
   };
 
   const handleLogin = async () => {
     setLoginError('');
-    
-    if (cpf.replace(/\D/g, '').length === 11 && password.length >= 4) {
+    const docNumbers = documento.replace(/\D/g, '');
+    const isCPF = docNumbers.length === 11;
+    const isCNPJ = docNumbers.length === 14;
+    if ((isCPF || isCNPJ) && password.length >= 4) {
       setIsLoading(true);
       try {
-        const response = await login({
-          userDoc: cpf.replace(/\D/g, ''),
+        const result = await login({
+          userDoc: docNumbers,
           password: password
         });
-        
-        if (response.status === 'success') {
-          const tokenStored = await storeToken(response.data);
-          
-          if (tokenStored) {
-            onLogin();
-          } else {
-            setLoginError('Falha interna - tente novamente');
-          }
-        } else if (response.status === 'error') {
-          setLoginError(response.data || 'Credenciais inválidas');
-        } else if (response.error) {
-          setLoginError(response.error);
+        if (result.success) {
+          // Salva documento e senha para login biométrico futuro
+          await AsyncStorage.setItem(LOGIN_DATA_KEY, JSON.stringify({ documento: docNumbers, password }));
+          // Login bem-sucedido - o AuthContext já gerencia o estado
+          console.log('Login realizado com sucesso!');
         } else {
-          setLoginError('Resposta inesperada do servidor');
+          setLoginError(result.error || 'Credenciais inválidas');
         }
       } catch (error) {
         console.error('Erro na requisição de login:', error);
@@ -68,7 +80,44 @@ const LoginScreen = ({ onLogin }) => {
         setIsLoading(false);
       }
     } else {
-      setLoginError('CPF deve ter 11 dígitos e senha pelo menos 4 caracteres');
+      setLoginError('Digite um CPF (11 dígitos) ou CNPJ (14 dígitos) válido e senha com pelo menos 4 caracteres');
+    }
+  };
+
+  const handleBiometricAuth = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!hasHardware || !isEnrolled) {
+      Alert.alert('Biometria não disponível', 'Seu dispositivo não suporta biometria ou não há biometria cadastrada.');
+      return;
+    }
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Autentique-se para entrar',
+      fallbackLabel: 'Usar senha',
+    });
+    if (result.success) {
+      // Buscar dados salvos
+      const saved = await AsyncStorage.getItem(LOGIN_DATA_KEY);
+      if (saved) {
+        const { documento, password } = JSON.parse(saved);
+        setDocumento(documento);
+        setPassword(password);
+        setIsLoading(true);
+        try {
+          const loginResult = await login({ userDoc: documento, password });
+          if (!loginResult.success) {
+            setLoginError(loginResult.error || 'Credenciais inválidas');
+          }
+        } catch (e) {
+          setLoginError('Erro ao tentar login biométrico');
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        Alert.alert('Dados não encontrados', 'Faça login manualmente ao menos uma vez para ativar a biometria.');
+      }
+    } else {
+      Alert.alert('Falha', 'Não foi possível autenticar com biometria.');
     }
   };
 
@@ -76,7 +125,7 @@ const LoginScreen = ({ onLogin }) => {
   
   return (
     <View style={styles.container}>
-      <CustomHeader showLogo={true} logoHeight={140} />
+      <CustomHeader showLogo={true} logoHeight={160} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
@@ -86,14 +135,14 @@ const LoginScreen = ({ onLogin }) => {
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>CPF</Text>
+            <Text style={styles.inputLabel}>CPF ou CNPJ</Text>
             <TextInput
               style={styles.input}
-              value={cpf}
-              onChangeText={formatCPF}
-              placeholder="000.000.000-00"
+              value={documento}
+              onChangeText={formatDocumento}
+              placeholder="CPF ou CNPJ"
               keyboardType="numeric"
-              maxLength={14}
+              maxLength={18} // 18: 00.000.000/0000-00
               placeholderTextColor={themeColors.darkGray}
             />
           </View>
@@ -148,7 +197,7 @@ const LoginScreen = ({ onLogin }) => {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.biometricButton}>
+          <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
             <Ionicons name="finger-print" size={24} color={themeColors.secondary} />
             <Text style={styles.biometricButtonText}>Entrar com biometria</Text>
           </TouchableOpacity>

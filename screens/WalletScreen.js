@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,54 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import CustomHeader from '../components/CustomHeader';
 import createStyles from '../styles/WalletStyles';
+import { useAuth } from '../constants/AuthContext';
+import { apiRequest } from '../services/api';
 
-const WalletScreen = ({ onBack }) => {
+const WalletScreen = ({ onBack, showFloatingNav = true }) => {
   const { theme, themeColors } = useTheme();
+  const { user, isAuthenticated } = useAuth();
   const styles = createStyles();
   const [selectedPeriod, setSelectedPeriod] = useState('Mês');
-  const [balance] = useState('R$ 180.250,00');
+  const [balance, setBalance] = useState(null);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+  const [isBalanceVisible, setIsBalanceVisible] = useState(false);
+  const [balanceError, setBalanceError] = useState('');
+
+  const fetchBalance = async () => {
+    if (!isAuthenticated || !user?.id) {
+      setBalance(null);
+      setBalanceError('');
+      setIsLoadingBalance(false);
+      return;
+    }
+    setIsLoadingBalance(true);
+    setBalanceError('');
+    try {
+      const result = await apiRequest({
+        classe: 'CarteiraRestService',
+        metodo: 'getCarteirasUsuario',
+        params: { usuario_id: user.id }
+      });
+      if (result.status === 'success' && result.data && result.data.length > 0) {
+        setBalance(result.data[0].saldo);
+      } else {
+        setBalance('0');
+        setBalanceError('Saldo não encontrado');
+      }
+    } catch (e) {
+      setBalanceError(e.message || 'Erro ao buscar saldo');
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [user, isAuthenticated]);
+
+  const handleRefreshBalance = () => {
+    fetchBalance();
+  };
 
   const monthlyData = [
     { month: 'fev/24', amount: 'R$ 0,5k', height: 60 },
@@ -37,7 +79,7 @@ const WalletScreen = ({ onBack }) => {
   ];
 
   const rightActions = [
-    { icon: 'refresh-outline', onPress: () => console.log('Refresh') },
+    { icon: 'refresh-outline', onPress: handleRefreshBalance },
     { icon: 'notifications-outline', onPress: () => console.log('Notifications') }
   ];
 
@@ -52,19 +94,35 @@ const WalletScreen = ({ onBack }) => {
 
       {/* Conteúdo Rolável */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Card Principal */}
-        <View style={styles.balanceCard}>
-          <Text style={styles.balance}>{balance}</Text>
-          
+                 {/* Card Principal */}
+         <View style={styles.balanceCard}>
+           <View style={styles.balanceHeader}>
+             <Text style={styles.balance}>
+               {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
+             </Text>
+             <TouchableOpacity 
+               style={styles.balanceVisibilityButton}
+               onPress={() => setIsBalanceVisible(!isBalanceVisible)}
+             >
+               <Ionicons 
+                 name={isBalanceVisible ? "eye-off" : "eye"} 
+                 size={20} 
+                 color={themeColors.secondary} 
+               />
+             </TouchableOpacity>
+           </View>
+           {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
           {/* Breakdown de Investimentos */}
           <View style={styles.investmentBreakdown}>
-            <View style={styles.investmentRow}>
-              <View style={styles.flagContainer}>
-                <Text style={styles.flag}>🇧🇷</Text>
-                <Text style={styles.investmentLabel}>Investido no Brasil</Text>
-              </View>
-              <Text style={styles.investmentAmount}>{balance}</Text>
-            </View>
+                         <View style={styles.investmentRow}>
+               <View style={styles.flagContainer}>
+                 <Text style={styles.flag}>🇧🇷</Text>
+                 <Text style={styles.investmentLabel}>Investido no Brasil</Text>
+               </View>
+               <Text style={styles.investmentAmount}>
+                 {isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••'}
+               </Text>
+             </View>
             
             <View style={styles.investmentRow}>
               <View style={styles.flagContainer}>
@@ -77,26 +135,30 @@ const WalletScreen = ({ onBack }) => {
               </TouchableOpacity>
             </View>
             
-            <View style={styles.investmentRow}>
-              <View style={styles.flagContainer}>
-                <Text style={styles.cryptoIcon}>₿</Text>
-                <Text style={styles.investmentLabel}>Investido em Cripto</Text>
-              </View>
-              <Text style={styles.investmentAmount}>-</Text>
-            </View>
+                         <View style={styles.investmentRow}>
+               <View style={styles.flagContainer}>
+                 <Text style={styles.cryptoIcon}>₿</Text>
+                 <Text style={styles.investmentLabel}>Investido em Cripto</Text>
+               </View>
+               <Text style={styles.investmentAmount}>
+                 {isBalanceVisible ? '-' : '••••••••••'}
+               </Text>
+             </View>
           </View>
 
-          {/* Seção de Resgate */}
-          <View style={styles.rescueSection}>
-            <Text style={styles.rescueLabel}>Disponível para resgate</Text>
-            <Ionicons name="help-circle" size={16} color={themeColors.secondary} style={styles.rescueHelp} />
-            <View style={styles.rescueRow}>
-              <Text style={styles.rescueAmount}>{balance}</Text>
-              <TouchableOpacity>
-                <Text style={styles.rescueButton}>Resgatar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                     {/* Seção de Resgate */}
+           <View style={styles.rescueSection}>
+             <Text style={styles.rescueLabel}>Disponível para resgate</Text>
+             <Ionicons name="help-circle" size={16} color={themeColors.secondary} style={styles.rescueHelp} />
+             <View style={styles.rescueRow}>
+               <Text style={styles.rescueAmount}>
+                 {isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••'}
+               </Text>
+               <TouchableOpacity>
+                 <Text style={styles.rescueButton}>Resgatar</Text>
+               </TouchableOpacity>
+             </View>
+           </View>
         </View>
 
         {/* Seção Brasil */}
