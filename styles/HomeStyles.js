@@ -4,7 +4,7 @@ import { useTheme } from '../constants/ThemeContext';
 const { width } = Dimensions.get('window');
 
 const createStyles = () => {
-  const { themeColors } = useTheme();
+  const { theme, themeColors } = useTheme();
 
   return StyleSheet.create({
     container: {
@@ -44,6 +44,11 @@ const createStyles = () => {
       flexDirection: 'row',
       gap: 16,
     },
+    balanceActionButton: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: 'rgba(85, 184, 128, 0.1)', // Fundo sutil para os botões de ação
+    },
     accessWallet: {
       alignSelf: 'flex-start',
     },
@@ -75,6 +80,11 @@ const createStyles = () => {
       position: 'relative',
       borderWidth: 1,
       borderColor: themeColors.border || themeColors.mediumGray,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
     },
     badge: {
       position: 'absolute',
@@ -104,7 +114,7 @@ const createStyles = () => {
       marginBottom: 20,
     },
     participationCard: {
-      backgroundColor: themeColors.cardBackground,
+      backgroundColor: theme === 'dark' ? themeColors.cardBackground : themeColors.primary, // Fundo escuro no tema escuro, azul no tema claro
       borderRadius: 16,
       padding: 24,
       flexDirection: 'row',
@@ -148,7 +158,7 @@ const createStyles = () => {
     participationIcon: {
       width: 64,
       height: 44,
-      backgroundColor: themeColors.white,
+      backgroundColor: theme === 'dark' ? themeColors.white : themeColors.secondary, // Fundo branco no tema escuro, verde no tema claro
       borderRadius: 12,
       justifyContent: 'center',
       alignItems: 'center',

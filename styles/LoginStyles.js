@@ -11,7 +11,7 @@ const createLoginStyles = (themeColors) => StyleSheet.create({
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
     marginTop: -20,
-    backgroundColor: '#111111',
+    backgroundColor: themeColors.cardBackground, // Usar cor do tema em vez de hardcoded
   },
   welcomeSection: {
     paddingVertical: 40,

@@ -55,11 +55,11 @@ const FloatingBottomNav = ({
 
   const getIconColor = (item) => {
     if (activeTab === item.id) {
-      return themeColors.white; // Ícone ativo sempre branco
+      return theme === 'dark' ? themeColors.white : themeColors.primary; // Ícone ativo: branco no escuro, azul no claro
     }
     return theme === 'dark' 
       ? themeColors.textSecondary || '#8A9199'
-      : themeColors.darkGray || '#666666';
+      : themeColors.darkGray || '#495057'; // Cor mais escura para tema claro
   };
 
   const getIconSize = (item) => {

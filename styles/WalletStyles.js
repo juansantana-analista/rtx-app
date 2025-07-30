@@ -41,7 +41,7 @@ const createStyles = () => {
     balanceVisibilityButton: {
       padding: 8,
       borderRadius: 8,
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      backgroundColor: 'rgba(85, 184, 128, 0.1)', // Fundo sutil para melhor contraste
     },
     investmentBreakdown: {
       marginBottom: 24,
@@ -77,6 +77,9 @@ const createStyles = () => {
     },
     helpIcon: {
       marginLeft: 8,
+      padding: 4,
+      borderRadius: 12,
+      backgroundColor: 'rgba(85, 184, 128, 0.1)', // Fundo sutil para melhor contraste
     },
     investmentAmount: {
       fontSize: 16,
@@ -104,6 +107,9 @@ const createStyles = () => {
       position: 'absolute',
       top: 20,
       right: 0,
+      padding: 4,
+      borderRadius: 12,
+      backgroundColor: 'rgba(85, 184, 128, 0.1)', // Fundo sutil para melhor contraste
     },
     rescueRow: {
       flexDirection: 'row',
@@ -169,7 +175,7 @@ const createStyles = () => {
       fontWeight: '500',
     },
     selectedPeriodButtonText: {
-      color: themeColors.white,
+      color: themeColors.theme === 'dark' ? themeColors.white : themeColors.white, // Mantém branco pois o fundo é azul
       fontWeight: 'bold',
     },
     updateInfo: {

@@ -155,10 +155,10 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
              </Text>
              {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
              <View style={styles.balanceActions}>
-               <TouchableOpacity onPress={handleRefreshBalance}>
+               <TouchableOpacity style={styles.balanceActionButton} onPress={handleRefreshBalance}>
                  <Ionicons name="refresh" size={20} color={themeColors.secondary} />
                </TouchableOpacity>
-               <TouchableOpacity onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
+               <TouchableOpacity style={styles.balanceActionButton} onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
                  <Ionicons 
                    name={isBalanceVisible ? "eye-off" : "eye"} 
                    size={20} 

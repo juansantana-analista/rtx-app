@@ -41,7 +41,7 @@ export const createHeaderStyles = (themeColors) => StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Mais opaco para melhor contraste
   },
   headerIcon: {
     color: themeColors.white,
@@ -53,7 +53,7 @@ export const createHeaderStyles = (themeColors) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Mais opaco para melhor contraste
   },
   themeToggleButton: {
     width: 32,
@@ -62,8 +62,8 @@ export const createHeaderStyles = (themeColors) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    backgroundColor: 'rgba(255, 215, 0, 0.3)', // Mais opaco para melhor contraste
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
+    borderColor: 'rgba(255, 215, 0, 0.5)', // Borda mais visível
   },
 });

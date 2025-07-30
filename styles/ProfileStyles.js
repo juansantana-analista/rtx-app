@@ -82,6 +82,11 @@ const createStyles = () => {
       borderRadius: 20,
       borderWidth: 1,
       borderColor: themeColors.border || themeColors.mediumGray,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
     },
     editProfileText: {
       fontSize: 16,

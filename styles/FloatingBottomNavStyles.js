@@ -17,20 +17,20 @@ const createFloatingNavStyles = (themeColors) => {
       flexDirection: 'row',
       backgroundColor: themeColors.theme === 'dark' 
         ? 'rgba(26, 31, 37, 0.98)' // Escuro semi-transparente
-        : 'rgba(255, 255, 255, 0.95)', // Claro semi-transparente
+        : 'rgba(255, 255, 255, 0.98)', // Claro mais opaco para melhor contraste
       borderRadius: 16,
       paddingVertical: 12,
       paddingHorizontal: 8,
       shadowColor: themeColors.black,
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: themeColors.theme === 'dark' ? 0.3 : 0.15,
+      shadowOpacity: themeColors.theme === 'dark' ? 0.3 : 0.2, // Sombra mais forte no claro
       shadowRadius: 16,
       elevation: 12,
       // Efeito de blur/backdrop (simulado com cores)
       borderWidth: 1,
       borderColor: themeColors.theme === 'dark' 
         ? 'rgba(255, 255, 255, 0.1)' 
-        : 'rgba(0, 0, 0, 0.05)',
+        : 'rgba(0, 0, 0, 0.1)', // Borda mais visível no tema claro
     },
 
     // Item individual de navegação
@@ -62,7 +62,7 @@ const createFloatingNavStyles = (themeColors) => {
     floatingNavText: {
       fontSize: 11,
       fontWeight: '400',
-      color: themeColors.white,
+      color: themeColors.theme === 'dark' ? themeColors.white : themeColors.primary, // Texto: branco no escuro, azul no claro
       letterSpacing: -0.2,
     },
 

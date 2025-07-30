@@ -6,14 +6,32 @@ export const lightColors = {
     black: '#000000',      // Preto
     white: '#FFFFFF',      // Branco
     
-    // Cores complementares (neutras apenas)
-    lightGray: '#F5F5F5',  // Cinza claro
-    mediumGray: '#E0E0E0', // Cinza médio
-    darkGray: '#666666',   // Cinza escuro
-    text: '#333333',       // Texto padrão
-    error: '#FF4444',      // Vermelho para erros
+    // Cores complementares (neutras apenas) - MELHORADAS para contraste
+    lightGray: '#F8F9FA',  // Cinza muito claro para fundos
+    mediumGray: '#E9ECEF', // Cinza médio para bordas
+    darkGray: '#495057',   // Cinza escuro para texto secundário
+    text: '#212529',       // Texto principal mais escuro
+    textSecondary: '#495057', // Texto secundário mais escuro
+    textTertiary: '#6C757D',  // Texto terciário
+    error: '#DC3545',      // Vermelho para erros
     background: '#FFFFFF', // Fundo claro
-    cardBackground: '#F5F5F5', // Fundo de cards
+    cardBackground: '#F8F9FA', // Fundo de cards
+    
+    // Cores de estado
+    success: '#28A745',    // Verde de sucesso
+    warning: '#FFC107',    // Amarelo de aviso
+    
+    // Cores de acento
+    accent: '#55B880',     // Verde RTX como cor de destaque
+    accentHover: '#4A9B6B', // Verde mais escuro para hover
+    
+    // Bordas e divisores
+    border: '#DEE2E6',     // Bordas mais visíveis
+    divider: '#E9ECEF',    // Divisores
+    
+    // Sobreposições
+    overlay: 'rgba(0, 0, 0, 0.5)', // Overlay para modais
+    shadow: 'rgba(0, 0, 0, 0.1)',  // Sombras
     
     // Cores específicas para Navigation Bar
     navigationBarBackground: '#FFFFFF', // Fundo da navigation bar (tema claro)

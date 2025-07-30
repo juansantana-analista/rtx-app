@@ -89,7 +89,7 @@ const CustomHeader = ({
                 style={[
                   headerStyles.headerActionButton,
                   (action.icon === 'sunny-outline' || action.icon === 'moon-outline') && {
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)', // Mais opaco para melhor contraste
                   }
                 ]}
                 onPress={action.onPress}

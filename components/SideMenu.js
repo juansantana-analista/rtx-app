@@ -89,7 +89,7 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
             {/* Header do Menu */}
             <View style={[styles.menuHeader, { borderBottomColor: themeColors.border || themeColors.mediumGray }]}>
               <Image 
-                source={require('../assets/rtx-x-color.png')} 
+                source={theme === 'dark' ? require('../assets/rtx-x-color.png') : require('../assets/rtx-x-black.png')} 
                 style={styles.logoImage}
                 resizeMode="contain"
               />
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Fundo mais visível para tema claro
   },
   userInfo: {
     alignItems: 'center',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 24,
     right: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Fundo mais visível para tema claro
     borderRadius: 12,
     padding: 4,
   },
