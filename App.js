@@ -5,6 +5,9 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import WalletScreen from './screens/WalletScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import AportesScreen from './screens/AportesScreen';
+import InvestmentsScreen from './screens/InvestmentsScreen';
+import AddBalanceScreen from './screens/AddBalanceScreen';
 import FloatingBottomNav from './components/FloatingBottomNav';
 import SideMenu from './components/SideMenu';
 import LoadingScreen from './components/LoadingScreen';
@@ -111,6 +114,27 @@ const AppContent = () => {
             showFloatingNav={false}
           />
         );
+      case 'aportes':
+        return (
+          <AportesScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
+      case 'investment':
+        return (
+          <InvestmentsScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={true}
+          />
+        );
+      case 'addBalance':
+        return (
+          <AddBalanceScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
       default:
         return (
           <HomeScreen 
@@ -144,7 +168,7 @@ const AppContent = () => {
       )}
 
       {/* Navegação Flutuante Global */}
-      {shouldShowFloatingNav && (
+      {shouldShowFloatingNav && currentScreen !== 'addBalance' && currentScreen !== 'aportes' && (
         <FloatingBottomNav
           activeTab={activeTab}
           onTabPress={handleTabPress}

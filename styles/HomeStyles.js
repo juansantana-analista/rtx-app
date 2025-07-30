@@ -49,13 +49,37 @@ const createStyles = () => {
       borderRadius: 8,
       backgroundColor: 'rgba(85, 184, 128, 0.1)', // Fundo sutil para os botões de ação
     },
+    balanceCardActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
     accessWallet: {
-      alignSelf: 'flex-start',
+      flex: 1,
     },
     accessWalletText: {
       color: themeColors.accent || themeColors.secondary,
       fontSize: 16,
       fontWeight: '600',
+    },
+    addBalanceButton: {
+      backgroundColor: themeColors.accent || themeColors.secondary,
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    addBalanceText: {
+      color: themeColors.white,
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: 4,
     },
     menuGrid: {
       flexDirection: 'row',

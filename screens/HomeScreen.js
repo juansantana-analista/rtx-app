@@ -63,10 +63,31 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
   };
 
   const menuItems = [
-    { id: 1, title: 'Calculadora de Câmbio', icon: 'calculator' },
-    { id: 2, title: 'Simulador', icon: 'analytics', badge: 'Novo' },
-    { id: 3, title: 'Escritórios', icon: 'business' },
-    { id: 4, title: 'Mostrar mais', icon: 'ellipsis-horizontal' },
+    { 
+      id: 1, 
+      title: 'Calculadora de Câmbio', 
+      icon: 'calculator',
+      onPress: () => console.log('Calculadora de Câmbio')
+    },
+    { 
+      id: 2, 
+      title: 'Aporte', 
+      icon: 'add-circle', 
+      badge: 'Novo',
+      onPress: () => onNavigate && onNavigate('aportes')
+    },
+    { 
+      id: 3, 
+      title: 'Escritórios', 
+      icon: 'business',
+      onPress: () => console.log('Escritórios')
+    },
+    { 
+      id: 4, 
+      title: 'Mostrar mais', 
+      icon: 'ellipsis-horizontal',
+      onPress: () => console.log('Mostrar mais')
+    },
   ];
 
   const investmentOptions = [
@@ -84,8 +105,6 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
       onPress: () => console.log('Notifications') 
     }
   ];
-
-
 
   const handleWalletPress = () => {
     setActiveTab('wallet');
@@ -109,10 +128,12 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     setActiveTab(tabId);
     console.log('Tab selecionada:', tabId);
     
-    // Aqui você pode adicionar navegação para outras telas se necessário
+    // Navegação para outras telas
     switch (tabId) {
       case 'investment':
-        console.log('Navegar para investimentos');
+        if (onNavigate && typeof onNavigate === 'function') {
+          onNavigate('investment');
+        }
         break;
       case 'shop':
         console.log('Navegar para shop');
@@ -139,8 +160,6 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
         rightActions={rightActions}
       />
 
-
-
       {/* Conteúdo Rolável */}
       <ScrollView 
         style={styles.content} 
@@ -149,35 +168,55 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
       >
         {/* Card de Saldo */}
         <View style={styles.balanceCard}>
-                     <View style={styles.balanceHeader}>
-             <Text style={styles.balanceAmount}>
-               {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
-             </Text>
-             {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
-             <View style={styles.balanceActions}>
-               <TouchableOpacity style={styles.balanceActionButton} onPress={handleRefreshBalance}>
-                 <Ionicons name="refresh" size={20} color={themeColors.secondary} />
-               </TouchableOpacity>
-               <TouchableOpacity style={styles.balanceActionButton} onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
-                 <Ionicons 
-                   name={isBalanceVisible ? "eye-off" : "eye"} 
-                   size={20} 
-                   color={themeColors.secondary} 
-                 />
-               </TouchableOpacity>
-             </View>
-           </View>
-          <TouchableOpacity style={styles.accessWallet} onPress={handleWalletPress}>
-            <Text style={styles.accessWalletText}>Acessar carteira</Text>
-          </TouchableOpacity>
+          <View style={styles.balanceHeader}>
+            <Text style={styles.balanceAmount}>
+              {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(balance).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
+            </Text>
+            {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
+            <View style={styles.balanceActions}>
+              <TouchableOpacity style={styles.balanceActionButton} onPress={handleRefreshBalance}>
+                <Ionicons name="refresh" size={20} color={themeColors.secondary} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.balanceActionButton} onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
+                <Ionicons 
+                  name={isBalanceVisible ? "eye-off" : "eye"} 
+                  size={20} 
+                  color={themeColors.secondary} 
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.balanceCardActions}>
+            <TouchableOpacity style={styles.accessWallet} onPress={handleWalletPress}>
+              <Text style={styles.accessWalletText}>Acessar carteira</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.addBalanceButton} 
+              onPress={() => onNavigate && onNavigate('addBalance')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add" size={18} color={themeColors.white} />
+              <Text style={styles.addBalanceText}>Adicionar Saldo</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Menu de Ações */}
         <View style={styles.menuGrid}>
           {menuItems.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.menuItem}>
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.menuItem}
+              onPress={item.onPress}
+              activeOpacity={0.7}
+            >
               <View style={styles.menuIconContainer}>
-                <Ionicons name={item.icon} size={24} color={item.id === 4 ? themeColors.darkGray : themeColors.secondary} />
+                <Ionicons 
+                  name={item.icon} 
+                  size={24} 
+                  color={item.id === 4 ? themeColors.darkGray : themeColors.secondary} 
+                />
                 {item.badge && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
@@ -227,15 +266,15 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
         <View style={floatingStyles.bottomSpacing} />
       </ScrollView>
 
-             {/* Navigation Bar Flutuante - apenas se showFloatingNav for true */}
-       {showFloatingNav && (
-         <FloatingBottomNav
-           activeTab={activeTab}
-           onTabPress={handleTabPress}
-           onWalletPress={handleWalletPress}
-           onProfilePress={handleProfilePress}
-         />
-       )}
+      {/* Navigation Bar Flutuante - apenas se showFloatingNav for true */}
+      {showFloatingNav && (
+        <FloatingBottomNav
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+          onWalletPress={handleWalletPress}
+          onProfilePress={handleProfilePress}
+        />
+      )}
     </View>
   );
 };
