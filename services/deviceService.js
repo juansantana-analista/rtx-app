@@ -8,64 +8,51 @@ const DEVICE_UUID_KEY = '@rtx_device_uuid';
  * @returns {string} UUID v4
  */
 const generateUUID = () => {
-  // Gera 16 bytes aleatórios
   const randomBytes = Crypto.getRandomValues(new Uint8Array(16));
-  
-  // Define a versão (4) e variante
-  randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40; // versão 4
-  randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80; // variante RFC 4122
-  
-  // Converte para string hexadecimal
+  randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40;
+  randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80;
   const hex = Array.from(randomBytes, byte => byte.toString(16).padStart(2, '0')).join('');
-  
-  // Formata como UUID
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 };
 
 class DeviceService {
   /**
-   * Gera ou recupera o UUID único do dispositivo
+   * Obtém o UUID do dispositivo, gerando um novo se não existir
    * @returns {Promise<string>} UUID do dispositivo
    */
   static async getDeviceUUID() {
     try {
-      // Tenta recuperar o UUID existente do storage
-      let deviceUUID = await AsyncStorage.getItem(DEVICE_UUID_KEY);
+      // Tentar recuperar UUID existente
+      const existingUUID = await AsyncStorage.getItem(DEVICE_UUID_KEY);
       
-             // Se não existir, gera um novo UUID v4
-       if (!deviceUUID) {
-         deviceUUID = generateUUID();
-         
-         // Salva o novo UUID no storage
-         await AsyncStorage.setItem(DEVICE_UUID_KEY, deviceUUID);
-         
-         console.log('🔐 Novo UUID do dispositivo gerado:', deviceUUID);
-       } else {
-         console.log('🔐 UUID do dispositivo recuperado:', deviceUUID);
-       }
-       
-       return deviceUUID;
-     } catch (error) {
-       console.error('❌ Erro ao gerenciar UUID do dispositivo:', error);
-       
-       // Em caso de erro, gera um UUID temporário
-       const fallbackUUID = generateUUID();
-       console.log('⚠️ UUID temporário gerado devido a erro:', fallbackUUID);
-       
-       return fallbackUUID;
+      if (existingUUID) {
+        console.log('🔐 UUID do dispositivo recuperado:', existingUUID);
+        return existingUUID;
+      }
+      
+      // Gerar novo UUID
+      const newUUID = generateUUID();
+      
+      // Salvar no storage
+      await AsyncStorage.setItem(DEVICE_UUID_KEY, newUUID);
+      
+      console.log('🔐 Novo UUID do dispositivo gerado:', newUUID);
+      return newUUID;
+    } catch (error) {
+      console.error('❌ Erro ao gerenciar UUID do dispositivo:', error);
+      throw error;
     }
   }
 
   /**
-   * Força a regeneração do UUID do dispositivo
-   * @returns {Promise<string>} Novo UUID gerado
+   * Regenera o UUID do dispositivo
+   * @returns {Promise<string>} Novo UUID
    */
   static async regenerateDeviceUUID() {
     try {
       const newUUID = generateUUID();
       await AsyncStorage.setItem(DEVICE_UUID_KEY, newUUID);
-      
-      console.log('🔄 UUID do dispositivo regenerado:', newUUID);
+      console.log('🔐 UUID do dispositivo regenerado:', newUUID);
       return newUUID;
     } catch (error) {
       console.error('❌ Erro ao regenerar UUID do dispositivo:', error);
@@ -75,12 +62,11 @@ class DeviceService {
 
   /**
    * Remove o UUID do dispositivo do storage
-   * @returns {Promise<void>}
    */
   static async clearDeviceUUID() {
     try {
       await AsyncStorage.removeItem(DEVICE_UUID_KEY);
-      console.log('🗑️ UUID do dispositivo removido do storage');
+      console.log('🔐 UUID do dispositivo removido');
     } catch (error) {
       console.error('❌ Erro ao remover UUID do dispositivo:', error);
       throw error;
@@ -88,13 +74,13 @@ class DeviceService {
   }
 
   /**
-   * Verifica se o dispositivo já possui um UUID salvo
-   * @returns {Promise<boolean>}
+   * Verifica se existe um UUID salvo
+   * @returns {Promise<boolean>} True se existe UUID salvo
    */
   static async hasDeviceUUID() {
     try {
-      const deviceUUID = await AsyncStorage.getItem(DEVICE_UUID_KEY);
-      return !!deviceUUID;
+      const uuid = await AsyncStorage.getItem(DEVICE_UUID_KEY);
+      return !!uuid;
     } catch (error) {
       console.error('❌ Erro ao verificar UUID do dispositivo:', error);
       return false;

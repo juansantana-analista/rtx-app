@@ -25,10 +25,6 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
       
-      // Aqui você pode adicionar uma chamada para validar o token no servidor
-      // const response = await validateToken(token);
-      // return response.valid;
-      
       return true;
     } catch (error) {
       console.error('Erro ao validar token:', error);
@@ -66,40 +62,35 @@ export const AuthProvider = ({ children }) => {
       if (storedToken) {
         const isValid = await checkTokenValidity(storedToken);
         
-        if (isValid) {
-          setToken(storedToken);
-          setIsAuthenticated(true);
-                     // Decodifica o JWT restaurado e popula o user
-           const decoded = decodeJWT(storedToken);
-           if (decoded) {
-             const userData = {
-               id: decoded.userid,
-               name: decoded.username,
-               email: decoded.usermail,
-               cpf: decoded.user,
-               is_gn: decoded.is_gn || false,
-             };
-             setUser(userData);
-           } else {
-             setUser(null);
-           }
-          // Aqui você pode buscar dados do usuário se necessário
-          // const userData = await getUserData(storedToken);
-          // setUser(userData);
-        } else {
+                  if (isValid) {
+            setToken(storedToken);
+            setIsAuthenticated(true);
+            // Decodifica o JWT restaurado e popula o user
+            const decoded = decodeJWT(storedToken);
+            if (decoded) {
+              const userData = {
+                id: decoded.userid,
+                name: decoded.username,
+                email: decoded.usermail,
+                cpf: decoded.user,
+                is_gn: decoded.is_gn || false,
+              };
+              setUser(userData);
+            } else {
+              setUser(null);
+            }
+          } else {
           // Token inválido, remove do storage
           await removeToken();
           setToken(null);
           setIsAuthenticated(false);
           setUser(null);
-          setIsLoading(false); // <-- Finaliza loading imediatamente após logout
-          return; // <-- Sai da função para não setar loading novamente
         }
-      } else {
-        setIsAuthenticated(false);
-        setToken(null);
-        setUser(null);
-      }
+              } else {
+          setIsAuthenticated(false);
+          setToken(null);
+          setUser(null);
+        }
     } catch (error) {
       console.error('Erro ao inicializar autenticação:', error);
       setIsAuthenticated(false);
@@ -119,30 +110,14 @@ export const AuthProvider = ({ children }) => {
       const result = await authServiceLogin(credentials);
       
       if (result.status === 'success' && result.data) {
-        // Decodificar o JWT
-        const decoded = decodeJWT(result.data);
-        
-        // Verificar se o dispositivo está liberado
-        if (decoded && decoded.dispositivo === false) {
-          // Dispositivo não liberado - mostrar tela de ativação
-          setIsLoading(false);
-          return { 
-            success: true, 
-            data: {
-              ...decoded,
-              token: result.data
-            },
-            requiresDeviceActivation: true 
-          };
-        }
-        
-        // Dispositivo liberado - fazer login normal
+        // Armazena o token
         const tokenStored = await storeToken(result.data);
         
         if (tokenStored) {
           setToken(result.data);
           setIsAuthenticated(true);
-          
+          // Decodifica o JWT para pegar os dados reais do usuário
+          const decoded = decodeJWT(result.data);
           if (decoded) {
             const userData = {
               id: decoded.userid,
@@ -150,18 +125,26 @@ export const AuthProvider = ({ children }) => {
               email: decoded.usermail,
               cpf: decoded.user,
               is_gn: decoded.is_gn || false,
+              // outros campos se necessário
             };
             setUser(userData);
+          } else {
+            setUser(null);
           }
-          
           return { success: true, data: decoded };
         } else {
+          setIsAuthenticated(false);
+          setUser(null);
           return { success: false, error: 'Erro ao salvar token' };
         }
       } else {
+        setIsAuthenticated(false);
+        setUser(null);
         return { success: false, error: result.data || 'Credenciais inválidas' };
       }
     } catch (error) {
+      setIsAuthenticated(false);
+      setUser(null);
       return { success: false, error: 'Erro de conexão' };
     } finally {
       setIsLoading(false);
@@ -206,6 +189,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+
   // Inicializa a autenticação quando o app é aberto
   useEffect(() => {
     initializeAuth();
@@ -225,8 +210,6 @@ export const AuthProvider = ({ children }) => {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, token]);
-
-
 
   useEffect(() => {
     registerGlobalLogout(logout);
@@ -256,4 +239,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+};
