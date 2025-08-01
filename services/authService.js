@@ -60,7 +60,8 @@ export const login = async (credentials) => {
       },
       body: JSON.stringify({
         userDoc: credentials.userDoc,
-        userPassword: credentials.password
+        userPassword: credentials.password,
+        deviceUuid: credentials.deviceUuid
       }),
       signal: controller.signal
     });
@@ -72,6 +73,13 @@ export const login = async (credentials) => {
     }
     
     const data = await response.json();
+    
+    // Verificar se a resposta tem o campo dispositivo
+    if (data && data.user && !data.hasOwnProperty('dispositivo')) {
+      console.log('⚠️ Resposta da API não tem campo dispositivo, assumindo não liberado');
+      data.dispositivo = false;
+    }
+    
     return data;
   } catch (error) {
     console.error('Erro na requisição de login:', error);

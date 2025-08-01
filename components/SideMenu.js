@@ -32,6 +32,12 @@ const SideMenu = ({ isVisible, onClose, onLogout, onNavigate }) => {
       title: 'Carteira',
       action: () => onNavigate('wallet')
     },
+    // Opção apenas para Gerentes de Negócios
+    ...(user?.is_gn ? [{
+      icon: 'people-outline',
+      title: 'Meus Clientes',
+      action: () => onNavigate('myClients')
+    }] : []),
     {
       icon: 'settings-outline',
       title: 'Configurações',

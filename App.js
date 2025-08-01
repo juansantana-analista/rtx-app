@@ -7,13 +7,19 @@ import WalletScreen from './screens/WalletScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AportesScreen from './screens/AportesScreen';
 import InvestmentsScreen from './screens/InvestmentsScreen';
-import AddBalanceScreen from './screens/AddBalanceScreen';
+import NewsScreen from './screens/NewsScreen';
+import ExtractPdfScreen from './screens/ExtractPdfScreen';
+import OfficesScreen from './screens/OfficesScreen';
+import MyClientsScreen from './screens/MyClientsScreen';
+import ClientDetailsScreen from './screens/ClientDetailsScreen';
+
 import FloatingBottomNav from './components/FloatingBottomNav';
 import SideMenu from './components/SideMenu';
 import LoadingScreen from './components/LoadingScreen';
 import SplashScreen from './components/SplashScreen';
 import { StyleSheet, View, Platform } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
+import DeviceService from './services/deviceService';
 
 // Componente principal que usa autenticação
 const AppContent = () => {
@@ -21,6 +27,24 @@ const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState('home');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [navigationParams, setNavigationParams] = useState(null);
+  const [deviceUUID, setDeviceUUID] = useState(null);
+
+  // Inicialização do UUID do dispositivo
+  useEffect(() => {
+    const initializeDeviceUUID = async () => {
+      try {
+        const uuid = await DeviceService.getDeviceUUID();
+        setDeviceUUID(uuid);
+        console.log('📱 UUID do dispositivo inicializado:', uuid);
+      } catch (error) {
+        console.error('❌ Erro ao inicializar UUID do dispositivo:', error);
+      }
+    };
+
+    initializeDeviceUUID();
+  }, []);
 
   // Configuração inicial da Navigation Bar
   useEffect(() => {
@@ -38,10 +62,11 @@ const AppContent = () => {
     configureInitialNavigationBar();
   }, []);
 
-  const handleNavigation = (screen) => {
+  const handleNavigation = (screen, params = null) => {
     setCurrentScreen(screen);
     setActiveTab(screen);
     setIsMenuVisible(false);
+    setNavigationParams(params);
   };
 
   const handleLogout = () => {
@@ -104,7 +129,12 @@ const AppContent = () => {
         return (
           <WalletScreen 
             onBack={() => handleNavigation('home')} 
-            showFloatingNav={false}
+            showFloatingNav={true}
+            onNavigate={handleNavigation}
+            onFloatingNavVisibilityChange={(show) => {
+              // Esta função será chamada pelo WalletScreen para controlar a visibilidade
+              setIsWalletModalOpen(!show);
+            }}
           />
         );
       case 'profile':
@@ -130,8 +160,106 @@ const AppContent = () => {
         );
       case 'addBalance':
         return (
-          <AddBalanceScreen 
+          <AportesScreen 
             onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
+      case 'news':
+        return (
+          <NewsScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
+      case 'extractPdf':
+        return (
+          <ExtractPdfScreen 
+            onBack={() => handleNavigation('wallet')}
+            showFloatingNav={false}
+            transactionHistory={[
+              {
+                id: 1,
+                type: 'reinvestimento',
+                title: 'Reinvestimento',
+                date: '2024-01-15',
+                amount: 350.00,
+                isPositive: true,
+              },
+              {
+                id: 2,
+                type: 'saque',
+                title: 'Saque',
+                date: '2024-01-14',
+                amount: 480.00,
+                isPositive: false,
+              },
+              {
+                id: 3,
+                type: 'rentabilidade',
+                title: 'Rentabilidade',
+                date: '2024-01-13',
+                amount: 1300.00,
+                percentage: '2,6%',
+                isPositive: true,
+              },
+              {
+                id: 4,
+                type: 'aporte',
+                title: 'Aporte',
+                date: '2024-01-12',
+                amount: 1000.00,
+                isPositive: true,
+              },
+              {
+                id: 5,
+                type: 'rentabilidade',
+                title: 'Rentabilidade',
+                date: '2024-01-11',
+                amount: 850.00,
+                percentage: '1,8%',
+                isPositive: true,
+              },
+              {
+                id: 6,
+                type: 'saque',
+                title: 'Saque',
+                date: '2024-01-10',
+                amount: 250.00,
+                isPositive: false,
+              },
+              {
+                id: 7,
+                type: 'aporte',
+                title: 'Aporte',
+                date: '2024-01-09',
+                amount: 2000.00,
+                isPositive: true,
+              },
+            ]}
+          />
+        );
+      case 'offices':
+        return (
+          <OfficesScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
+      case 'myClients':
+        return (
+          <MyClientsScreen 
+            onBack={() => handleNavigation('home')}
+            onNavigate={handleNavigation}
+            showFloatingNav={false}
+          />
+        );
+      case 'clientDetails':
+        return (
+          <ClientDetailsScreen 
+            onBack={() => handleNavigation('myClients')}
+            onNavigate={handleNavigation}
+            route={{ params: navigationParams }}
             showFloatingNav={false}
           />
         );
@@ -153,6 +281,15 @@ const AppContent = () => {
   // Determinar se deve mostrar a navegação flutuante
   const shouldShowFloatingNav = isAuthenticated;
 
+  // Se não está autenticado, mostrar tela de login
+  if (!isAuthenticated) {
+    return (
+      <View style={styles.container}>
+        <LoginScreen />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {renderScreen()}
@@ -168,7 +305,12 @@ const AppContent = () => {
       )}
 
       {/* Navegação Flutuante Global */}
-      {shouldShowFloatingNav && currentScreen !== 'addBalance' && currentScreen !== 'aportes' && (
+      {shouldShowFloatingNav && 
+       currentScreen !== 'addBalance' && 
+       currentScreen !== 'aportes' && 
+       currentScreen !== 'myClients' && 
+       currentScreen !== 'clientDetails' && 
+       !isWalletModalOpen && (
         <FloatingBottomNav
           activeTab={activeTab}
           onTabPress={handleTabPress}

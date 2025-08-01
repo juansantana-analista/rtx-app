@@ -1,0 +1,277 @@
+import { StyleSheet } from 'react-native';
+
+const createStyles = (themeColors) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: themeColors.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 20,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: themeColors.background,
+    },
+    loadingText: {
+      marginTop: 16,
+      fontSize: 16,
+      fontWeight: '500',
+      color: themeColors.textSecondary,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: themeColors.background,
+      padding: 20,
+    },
+    errorText: {
+      fontSize: 18,
+      fontWeight: '600',
+      marginTop: 16,
+      marginBottom: 24,
+      textAlign: 'center',
+      color: themeColors.error,
+    },
+    retryButton: {
+      backgroundColor: themeColors.primary,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    clientInfoCard: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 16,
+      padding: 20,
+      marginTop: 20,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    clientHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    clientAvatar: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: themeColors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+    },
+    clientInitial: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#FFFFFF',
+    },
+    clientInfo: {
+      flex: 1,
+    },
+    clientName: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      marginBottom: 4,
+    },
+    clientCpf: {
+      fontSize: 14,
+      color: themeColors.textSecondary,
+      fontWeight: '500',
+      marginBottom: 8,
+    },
+    clientStatus: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    statusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginRight: 6,
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+    },
+    contactInfo: {
+      borderTopWidth: 1,
+      borderTopColor: themeColors.border,
+      paddingTop: 16,
+    },
+    contactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    contactText: {
+      fontSize: 14,
+      color: themeColors.textSecondary,
+      marginLeft: 12,
+      flex: 1,
+    },
+    financialCard: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    cardTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      marginBottom: 16,
+    },
+    financialGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    financialItem: {
+      width: '48%',
+      marginBottom: 16,
+    },
+    financialLabel: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: themeColors.textSecondary,
+      marginBottom: 4,
+    },
+    financialValue: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: themeColors.text,
+    },
+    investmentsCard: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    investmentItem: {
+      borderBottomWidth: 1,
+      borderBottomColor: themeColors.border,
+      paddingBottom: 16,
+      marginBottom: 16,
+    },
+    investmentHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    investmentProduct: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: themeColors.text,
+    },
+    investmentStatus: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    investmentDetails: {
+      backgroundColor: themeColors.background,
+      borderRadius: 8,
+      padding: 12,
+    },
+    investmentRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    investmentLabel: {
+      fontSize: 14,
+      color: themeColors.textSecondary,
+      fontWeight: '500',
+    },
+    investmentValue: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: themeColors.text,
+    },
+    transactionsCard: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    transactionItem: {
+      borderBottomWidth: 1,
+      borderBottomColor: themeColors.border,
+      paddingBottom: 16,
+      marginBottom: 16,
+    },
+    transactionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    transactionInfo: {
+      flex: 1,
+      marginRight: 16,
+    },
+    transactionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: themeColors.text,
+      marginBottom: 4,
+    },
+    transactionDate: {
+      fontSize: 12,
+      color: themeColors.textSecondary,
+      marginBottom: 4,
+    },
+    transactionDescription: {
+      fontSize: 14,
+      color: themeColors.textSecondary,
+    },
+         transactionAmount: {
+       fontSize: 16,
+       fontWeight: 'bold',
+     },
+     emptyContainer: {
+       alignItems: 'center',
+       justifyContent: 'center',
+       padding: 20,
+       marginVertical: 10,
+     },
+     emptyText: {
+       fontSize: 14,
+       textAlign: 'center',
+       color: themeColors.textSecondary,
+     },
+   });
+ };
+
+export default createStyles; 

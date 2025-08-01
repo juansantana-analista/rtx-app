@@ -15,9 +15,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import CustomHeader from '../components/CustomHeader';
+import FloatingLoader from '../components/FloatingLoader';
 import { useAuth } from '../constants/AuthContext';
 import * as LocalAuthentication from 'expo-local-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useDeviceUUID from '../hooks/useDeviceUUID';
+import DeviceActivationScreen from './DeviceActivationScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,11 +29,16 @@ const LOGIN_DATA_KEY = '@RTX:loginData';
 const LoginScreen = () => {
   const { themeColors } = useTheme();
   const { login } = useAuth();
+  const { deviceUUID } = useDeviceUUID();
   const [documento, setDocumento] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [showDeviceActivation, setShowDeviceActivation] = useState(false);
+  const [userToken, setUserToken] = useState(null);
+
+
 
   const formatDocumento = (text) => {
     const numbers = text.replace(/\D/g, '');
@@ -63,9 +71,23 @@ const LoginScreen = () => {
       try {
         const result = await login({
           userDoc: docNumbers,
-          password: password
+          password: password,
+          deviceUuid: deviceUUID
         });
+        
         if (result.success) {
+          // Verificar se o dispositivo está liberado
+          if (result.requiresDeviceActivation) {
+            console.log('📱 Dispositivo precisa de ativação');
+            // Dispositivo não liberado - mostrar tela de ativação
+            setUserToken(result.data.token || result.data); // Salvar token temporário
+            console.log('🔧 Definindo showDeviceActivation como true');
+            setShowDeviceActivation(true);
+            setIsLoading(false);
+            console.log('🔧 Estados definidos, retornando...');
+            return;
+          }
+          
           // Salva documento e senha para login biométrico futuro
           await AsyncStorage.setItem(LOGIN_DATA_KEY, JSON.stringify({ documento: docNumbers, password }));
           // Login bem-sucedido - o AuthContext já gerencia o estado
@@ -104,10 +126,16 @@ const LoginScreen = () => {
         setPassword(password);
         setIsLoading(true);
         try {
-          const loginResult = await login({ userDoc: documento, password });
-          if (!loginResult.success) {
-            setLoginError(loginResult.error || 'Credenciais inválidas');
+                  const loginResult = await login({ userDoc: documento, password, deviceUuid: deviceUUID });
+        if (loginResult.success) {
+          // Verificar se o dispositivo está liberado
+          if (loginResult.requiresDeviceActivation) {
+            setShowDeviceActivation(true);
+            return;
           }
+        } else {
+          setLoginError(loginResult.error || 'Credenciais inválidas');
+        }
         } catch (e) {
           setLoginError('Erro ao tentar login biométrico');
         } finally {
@@ -122,6 +150,22 @@ const LoginScreen = () => {
   };
 
   const styles = createLoginStyles(themeColors);
+  
+  // Se precisar ativar o dispositivo, mostrar a tela de ativação
+  if (showDeviceActivation) {
+    return (
+      <DeviceActivationScreen
+        onBack={() => setShowDeviceActivation(false)}
+        onSuccess={() => {
+          setShowDeviceActivation(false);
+          setUserToken(null);
+          // Tentar login novamente após ativação
+          handleLogin();
+        }}
+        userToken={userToken}
+      />
+    );
+  }
   
   return (
     <View style={styles.container}>
@@ -213,6 +257,9 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+
+      {/* Loader flutuante */}
+      {isLoading && <FloatingLoader message="Fazendo login..." />}
     </View>
   );
 };

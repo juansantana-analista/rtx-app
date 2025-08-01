@@ -12,16 +12,28 @@ const api = axios.create({
   }
 });
 
+// Função para verificar se o JWT expirou
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    return payload.exp < currentTime;
+  } catch (error) {
+    console.error('Erro ao verificar expiração do token:', error);
+    return true; // Considera como expirado se não conseguir decodificar
+  }
+};
+
 // Interceptor para tratar respostas
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
-    // Se receber 401 (Unauthorized), pode ser que o token expirou
+    // Se receber 401 (Unauthorized), força logout
     if (error.response && error.response.status === 401) {
-      console.log('Token expirado ou inválido');
-      // Aqui você pode implementar refresh token ou logout automático
+      console.log('Token expirado ou inválido - Forçando logout');
+      forceGlobalLogout();
     }
     
     return Promise.reject(error);
@@ -42,7 +54,16 @@ export async function apiRequest({ classe, metodo, params = {} }) {
   // Recupera o token JWT salvo
   const token = await AsyncStorage.getItem('@RTX:authToken');
   if (!token) {
+    console.log('Token não encontrado - Forçando logout');
+    forceGlobalLogout();
     throw new Error('Token não encontrado. Faça login novamente.');
+  }
+
+  // Verifica se o token expirou antes de fazer a requisição
+  if (isTokenExpired(token)) {
+    console.log('Token expirado - Forçando logout');
+    forceGlobalLogout();
+    throw new Error('Sessão expirada. Faça login novamente.');
   }
 
   // Monta o body
@@ -52,25 +73,52 @@ export async function apiRequest({ classe, metodo, params = {} }) {
     ...params
   };
 
-  // Faz a requisição
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(body)
-  });
+  try {
+    // Faz a requisição
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  // Se o JWT for inválido, pode tratar aqui
-  if (data.status === 'error' && data.data && typeof data.data === 'string' && data.data.includes('Signature verification failed')) {
-    forceGlobalLogout();
-    throw new Error('Sessão expirada. Faça login novamente.');
+    // Verifica se a resposta indica token inválido
+    if (data.status === 'error' && data.data && typeof data.data === 'string' && 
+        (data.data.includes('Signature verification failed') || 
+         data.data.includes('Token expired') ||
+         data.data.includes('Invalid token'))) {
+      console.log('Token inválido na resposta - Forçando logout');
+      forceGlobalLogout();
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
+
+    // Verifica se recebeu 401
+    if (response.status === 401) {
+      console.log('Status 401 recebido - Forçando logout');
+      forceGlobalLogout();
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
+
+    return data;
+  } catch (error) {
+    // Se for erro de rede ou outro tipo, verifica se é relacionado a autenticação
+    if (error.message.includes('Sessão expirada') || error.message.includes('Token')) {
+      throw error; // Re-throw para não duplicar o logout
+    }
+    
+    // Para outros erros, verifica se o token ainda é válido
+    if (token && isTokenExpired(token)) {
+      console.log('Token expirado durante requisição - Forçando logout');
+      forceGlobalLogout();
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
+    
+    throw error;
   }
-
-  return data;
 }
 
 export default api;

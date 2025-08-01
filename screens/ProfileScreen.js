@@ -118,8 +118,8 @@ const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
 
   const rightActions = [
     { 
-      icon: 'settings-outline', 
-      onPress: () => console.log('Configurações rápidas') 
+      icon: 'notifications-outline', 
+      onPress: () => console.log('Notificações') 
     }
   ];
 

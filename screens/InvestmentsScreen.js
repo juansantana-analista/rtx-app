@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import { useAuth } from '../constants/AuthContext';
 import CustomHeader from '../components/CustomHeader';
+import FloatingLoader from '../components/FloatingLoader';
 import createStyles from '../styles/InvestmentsStyles';
 
 const InvestmentsScreen = ({ onBack }) => {
@@ -406,7 +407,7 @@ const InvestmentsScreen = ({ onBack }) => {
           <View style={styles.summaryYield}>
             <View style={styles.yieldItem}>
               <Ionicons name="trending-up" size={20} color={themeColors.success} />
-              <Text style={styles.yieldLabel}>Rendimento Total</Text>
+              <Text style={styles.yieldLabel}>Rendimento</Text>
             </View>
             <Text style={styles.yieldAmount}>
               +{formatCurrency(totalYield)}
@@ -559,6 +560,9 @@ const InvestmentsScreen = ({ onBack }) => {
           </ScrollView>
         </View>
       </Modal>
+
+      {/* Loader flutuante */}
+      {isLoading && <FloatingLoader message="Carregando investimentos..." />}
     </View>
   );
 };

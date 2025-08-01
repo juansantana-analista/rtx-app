@@ -1,226 +1,442 @@
 # RTX-APP
 
-## Visão Geral
-Este projeto é um app React Native que utiliza autenticação JWT e faz requisições dinâmicas para um backend PHP. O código foi estruturado para facilitar a manutenção, reutilização e expansão de funcionalidades.
+## 📱 Visão Geral
+O **RTX-APP** é um aplicativo React Native completo para gestão de investimentos, desenvolvido com foco em experiência do usuário, segurança e funcionalidades avançadas. O app oferece uma plataforma completa para investidores gerenciarem seus aportes, acompanharem rentabilidades e acessarem informações do mercado financeiro.
 
 ---
 
-## Estrutura de Requisições
+## 🚀 Funcionalidades Principais
 
-### 1. Requisições Genéricas (API Principal)
-- **Arquivo:** `services/api.js`
-- **Função principal:** `apiRequest({ classe, metodo, params })`
-- **Responsabilidade:**
-  - Envia requisições autenticadas para a API principal (`rest.php`).
-  - Usa o JWT salvo no AsyncStorage automaticamente.
-  - Permite passar a classe, método e parâmetros de cada chamada.
-  - Centraliza o tratamento de erros de autenticação (ex: JWT expirado).
+### 🔐 **Sistema de Autenticação**
+- **Login seguro** com CPF/CNPJ e senha
+- **Autenticação JWT** com persistência de sessão
+- **Biometria opcional** para acesso rápido
+- **Logout global** com limpeza automática de dados
+- **Validação de token** com redirecionamento automático
+- **Controle de perfil** (Gerente de Negócios vs Cliente)
 
-#### Exemplo de uso:
-```js
-import { apiRequest } from '../services/api';
+### 🏠 **Tela Inicial (HomeScreen)**
+- **Saldo total em operação** com visibilidade controlada
+- **Meus Investimentos** - Cards com produtos ativos do usuário
+- **Preview de Notícias** - Últimas 4 notícias em scroll horizontal
+- **Menu de ações rápidas**: Aporte, Notícias, Escritórios
+- **Card de Participação Disponível** com período de disponibilidade
+- **Navegação intuitiva** com FloatingBottomNav
 
-const resultado = await apiRequest({
-  classe: 'CarteiraRestService',
-  metodo: 'getCarteirasUsuario',
-  params: { usuario_id: user.id }
-});
+### 💰 **Tela de Carteira (WalletScreen)**
+- **Saldo total em operação** com título descritivo
+- **Saldo disponível para resgate** com controle independente de visibilidade
+- **Cartões de investimento** estilo cartão de crédito com:
+  - Logo da empresa
+  - Nome do produto
+  - Valor investido (ocultável)
+  - Período e rentabilidade
+  - Status ativo/inativo
+- **Funcionalidade de Resgate** com modal bottom sheet:
+  - Seleção de valor ou porcentagem
+  - Botões de sugestão (25%, 50%, 75%, 100%)
+  - Confirmação com modal de sucesso animado
+- **Extrato de transações** com histórico completo
+- **Botão "+ Novo Aporte"** para investimentos
+- **Opção de impressão** do extrato em PDF
+
+### 📈 **Tela de Aportes (AportesScreen)**
+- **Fluxo unificado** de investimento (valor → produto → pagamento)
+- **Seleção de valor** com máscara de moeda em tempo real
+- **Catálogo de produtos** com informações detalhadas:
+  - DEMO, PRIVATE, PRO, SELECT, EVOLVE, ABSOLUTE
+  - Rentabilidade, período, risco e valor mínimo
+- **Métodos de pagamento**:
+  - **PIX** com QR Code e código copia e cola
+  - **Transferência bancária** com dados da conta
+- **Upload de comprovantes** (imagens e documentos)
+- **Validação automática** de valores mínimos
+- **Auto-scroll** para botão de confirmação
+
+### 📰 **Tela de Notícias (NewsScreen)**
+- **Categorias de notícias** com filtros
+- **Pull-to-refresh** para atualização
+- **Cards de notícias** com:
+  - Imagem destacada
+  - Categoria e tempo de leitura
+  - Data de publicação
+  - Título e resumo
+- **Notícias em destaque** com badge especial
+- **Navegação fluida** entre notícias
+
+### 🏢 **Tela de Escritórios (OfficesScreen)**
+- **Lista de escritórios** da empresa
+- **Informações completas**:
+  - Foto do escritório
+  - Endereço completo
+  - Telefone e email
+  - Horário de funcionamento
+- **Ações rápidas**:
+  - Ligar diretamente
+  - Abrir WhatsApp
+  - Enviar email
+- **Pull-to-refresh** para atualização
+- **Integração com API** `EscritorioRestService.loadAll`
+
+### 📄 **Tela de Extrato PDF (ExtractPdfScreen)**
+- **Extrato completo** em formato PDF
+- **Informações detalhadas**:
+  - Dados do cliente
+  - Resumo financeiro
+  - Histórico de transações
+  - Totais e saldos
+- **Funcionalidades de exportação**:
+  - Download do PDF
+  - Compartilhamento
+  - Impressão
+- **Design profissional** similar a bancos digitais
+
+### 👤 **Tela de Perfil (ProfileScreen)**
+- **Dados pessoais** do usuário
+- **Configurações** da conta
+- **Preferências** de privacidade
+- **Histórico** de atividades
+
+### 👥 **Tela Meus Clientes (MyClientsScreen)** - *Apenas para Gerentes de Negócios*
+- **Lista de clientes** do gerente
+- **Resumo financeiro** consolidado
+- **Status dos clientes** (ativo/inativo)
+- **Informações de contato** e valores investidos
+- **Pull-to-refresh** para atualização
+- **Busca e filtros** (futuro)
+
+### 📋 **Tela Detalhes do Cliente (ClientDetailsScreen)** - *Apenas para Gerentes de Negócios*
+- **Informações completas** do cliente
+- **Resumo financeiro** detalhado
+- **Lista de investimentos** com rentabilidades
+- **Histórico de transações** completo
+- **Ações de contato** (ligar, WhatsApp, email)
+- **Dados de cadastro** e última atividade
+
+### 📊 **Tela de Investimentos (InvestmentsScreen)**
+- **Visão detalhada** dos investimentos
+- **Análises** e relatórios
+- **Comparativos** de rentabilidade
+- **Projeções** futuras
+
+---
+
+## 🛠️ Arquitetura Técnica
+
+### **Estrutura de Requisições**
+- **API Centralizada** (`services/api.js`)
+- **Função genérica** `apiRequest({ classe, metodo, params })`
+- **Autenticação automática** com JWT
+- **Tratamento de erros** centralizado
+- **Interceptors** para respostas HTTP
+
+### **Sistema de Autenticação**
+- **Context API** (`constants/AuthContext.js`)
+- **Persistência** com AsyncStorage
+- **Decodificação JWT** automática
+- **Validação de token** periódica
+- **Logout global** (`services/globalLogout.js`)
+
+### **Gerenciamento de Estado**
+- **Context para tema** (`constants/ThemeContext.js`)
+- **Context para autenticação** (`constants/AuthContext.js`)
+- **Estados locais** com useState
+- **Efeitos** com useEffect para sincronização
+
+### **Navegação**
+- **Sistema customizado** sem React Navigation
+- **FloatingBottomNav** para navegação principal
+- **SideMenu** para opções adicionais
+- **Modais** para ações específicas
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+RTX-APP/
+├── 📱 screens/                    # Telas principais
+│   ├── HomeScreen.js             # Tela inicial
+│   ├── WalletScreen.js           # Carteira e investimentos
+│   ├── AportesScreen.js          # Fluxo de aportes
+│   ├── NewsScreen.js             # Notícias do mercado
+│   ├── OfficesScreen.js          # Escritórios da empresa
+│   ├── ExtractPdfScreen.js       # Extrato em PDF
+│   ├── ProfileScreen.js          # Perfil do usuário
+│   ├── MyClientsScreen.js        # Clientes do Gerente de Negócios
+│   ├── ClientDetailsScreen.js    # Detalhes do cliente
+│   ├── InvestmentsScreen.js      # Detalhes de investimentos
+│   └── LoginScreen.js            # Autenticação
+├── 🧩 components/                 # Componentes reutilizáveis
+│   ├── CustomHeader.js           # Header personalizado
+│   ├── FloatingBottomNav.js      # Navegação inferior
+│   ├── SideMenu.js               # Menu lateral
+│   ├── NavigationMenu.js         # Menu de navegação
+│   ├── SplashScreen.js           # Tela de carregamento
+│   └── LoadingScreen.js          # Componente de loading
+├── 🔧 services/                   # Serviços e APIs
+│   ├── api.js                    # Requisições genéricas
+│   ├── authService.js            # Autenticação
+│   ├── globalLogout.js           # Logout global
+│   └── jwtDecoder.js             # Decodificação JWT
+├── 🎨 styles/                     # Estilos das telas
+│   ├── HomeStyles.js             # Estilos da Home
+│   ├── WalletStyles.js           # Estilos da Carteira
+│   ├── AportesStyles.js          # Estilos de Aportes
+│   ├── NewsStyles.js             # Estilos de Notícias
+│   ├── OfficesStyles.js          # Estilos de Escritórios
+│   ├── ExtractPdfStyles.js       # Estilos do Extrato
+│   ├── ProfileStyles.js          # Estilos do Perfil
+│   ├── MyClientsStyles.js        # Estilos dos Clientes
+│   ├── ClientDetailsStyles.js    # Estilos dos Detalhes do Cliente
+│   ├── InvestmentsStyles.js      # Estilos de Investimentos
+│   ├── LoginStyles.js            # Estilos do Login
+│   └── FloatingBottomNavStyles.js # Estilos da navegação
+├── 🔄 constants/                  # Contextos e constantes
+│   ├── AuthContext.js            # Contexto de autenticação
+│   ├── ThemeContext.js           # Contexto de tema
+│   ├── colors.js                 # Paleta de cores
+│   └── apiTypes.js               # Tipos da API
+├── 🎣 hooks/                      # Hooks customizados
+│   ├── useNavigationBar.js       # Hook de navegação
+│   └── useUser.js                # Hook de usuário
+├── 🛠️ utils/                      # Utilitários
+│   └── SystemUIManager.js        # Gerenciamento de UI
+└── 📦 assets/                     # Recursos visuais
+    ├── icon.png                  # Ícone do app
+    ├── splash-icon.png           # Ícone de splash
+    ├── logortx.png               # Logo RTX
+    ├── rtx-x.png                 # Logo RTX X
+    └── user.png                  # Avatar padrão
 ```
 
-- **Para adicionar novos endpoints:**
-  - Basta chamar `apiRequest` com a nova classe, método e parâmetros.
-- **Para tratar erros globais:**
-  - Centralize no `apiRequest` para facilitar manutenção.
+---
+
+## 🎨 Sistema de Design
+
+### **Temas e Cores**
+- **Tema claro/escuro** com toggle automático
+- **Paleta de cores** consistente
+- **Tipografia** padronizada
+- **Espaçamentos** uniformes
+- **Sombras e elevações** consistentes
+
+### **Componentes Visuais**
+- **Cards** com bordas arredondadas
+- **Botões** com estados visuais
+- **Modais** com animações suaves
+- **Loading states** informativos
+- **Feedback visual** para ações
+
+### **Responsividade**
+- **Layout adaptativo** para diferentes telas
+- **Scroll views** otimizados
+- **Touch targets** adequados
+- **Acessibilidade** considerada
 
 ---
 
-### 2. Autenticação (Login e Token)
-- **Arquivo:** `services/authService.js`
-- **Responsabilidade:**
-  - Login do usuário (CPF/CNPJ e senha).
-  - Armazena, recupera e remove o token JWT.
-  - Não usa o `apiRequest`, pois o endpoint de login é diferente.
-- **Funções principais:**
-  - `login(credentials)`
-  - `storeToken(token)`
-  - `getToken()`
-  - `removeToken()`
+## 🔌 Integração com APIs
 
----
+### **Endpoints Principais**
+```javascript
+// Autenticação
+POST /rest.php (class: 'AuthRestService', method: 'login')
 
-### 3. Contexto de Autenticação
-- **Arquivo:** `constants/AuthContext.js`
-- **Responsabilidade:**
-  - Gerencia o estado global de autenticação e usuário.
-  - Decodifica o JWT após login e ao abrir o app, preenchendo o contexto do usuário (`user`).
-  - Exemplo de dados no contexto:
-    ```js
-    user = {
-      id: decoded.userid,
-      name: decoded.username,
-      email: decoded.usermail,
-      cpf: decoded.user,
+// Carteira
+POST /rest.php (class: 'CarteiraRestService', method: 'getCarteirasUsuario')
+
+// Escritórios
+POST /rest.php (class: 'EscritorioRestService', method: 'loadAll')
+
+// Aportes
+POST /rest.php (class: 'AporteRestService', method: 'create')
+
+// Resgates
+POST /rest.php (class: 'ResgateRestService', method: 'create')
+```
+
+### **Estrutura de Resposta**
+```javascript
+{
+  "status": "success",
+  "data": {
+    "saldo": "2977",
+    "saldo_bloqueado": "198497", 
+    "saldo_total": "201474",
+    "rentabilidade_acumulada": "0",
+    "data_ultima_movimentacao": "2025-07-29"
+  }
     }
     ```
 
 ---
 
-### 4. Exemplo prático de uso no app
-- **Buscar saldo da carteira:**
-  - Implementado em `HomeScreen.js` e `WalletScreen.js`:
-  ```js
-  import { apiRequest } from '../services/api';
-  // ...
-  const result = await apiRequest({
-    classe: 'CarteiraRestService',
-    metodo: 'getCarteirasUsuario',
-    params: { usuario_id: user.id }
-  });
+## 🚀 Como Executar
+
+### **Pré-requisitos**
+- Node.js 16+
+- Expo CLI
+- React Native development environment
+
+### **Instalação**
+```bash
+# Clone o repositório
+git clone [url-do-repositorio]
+
+# Instale as dependências
+npm install
+
+# Execute o projeto
+expo start
+```
+
+### **Dependências Principais**
+```json
+{
+  "expo": "^49.0.0",
+  "react-native": "0.72.6",
+  "@expo/vector-icons": "^13.0.0",
+  "expo-document-picker": "~11.5.4",
+  "expo-file-system": "~15.4.5",
+  "expo-print": "~12.4.1",
+  "expo-sharing": "~11.5.0",
+  "@react-native-async-storage/async-storage": "1.18.2"
+}
   ```
 
 ---
 
-## Fluxos do App
+## 🔧 Funcionalidades Avançadas
 
-### Fluxo de Autenticação
-1. Usuário faz login com CPF/CNPJ e senha.
-2. O backend retorna um JWT.
-3. O JWT é salvo no AsyncStorage e decodificado para preencher o contexto do usuário.
-4. Ao abrir o app novamente, o JWT é restaurado e decodificado automaticamente.
-5. Todas as requisições autenticadas usam esse JWT.
+### **Sistema de Modais**
+- **Bottom sheet modais** para ações
+- **Modais de confirmação** com animações
+- **Modais de sucesso** com feedback visual
+- **Controle de visibilidade** da navegação
 
-### Fluxo de Requisições Dinâmicas
-1. O componente chama `apiRequest` passando a classe, método e parâmetros.
-2. O JWT é adicionado automaticamente no header.
-3. O backend responde e o resultado é tratado no componente.
+### **Upload de Arquivos**
+- **Seleção de imagens** e documentos
+- **Preview** de arquivos selecionados
+- **Validação** de tipos e tamanhos
+- **Upload** para servidor
 
-### Fluxo de Exibição de Saldo
-1. O componente Home ou Carteira chama `apiRequest` para buscar o saldo.
-2. O saldo é exibido na tela, com loading e tratamento de erro.
+### **Geração de PDFs**
+- **Extrato completo** em formato PDF
+- **Design profissional** similar a bancos
+- **Download** e compartilhamento
+- **Compatibilidade** multiplataforma
 
----
-
-## Funcionamento das Telas
-
-- **`screens/HomeScreen.js`**
-  - Exibe o saldo principal do usuário, atalhos, cards promocionais e oportunidades.
-  - Busca o saldo dinamicamente ao montar a tela.
-  - Usa o contexto de autenticação para obter o usuário logado.
-
-- **`screens/WalletScreen.js`**
-  - Exibe o saldo detalhado, breakdown de investimentos, gráfico e opções de resgate.
-  - Busca o saldo dinamicamente ao montar a tela.
-
-- **`screens/LoginScreen.js`**
-  - Permite login com CPF ou CNPJ.
-  - Integra biometria (opcional).
-  - Salva o JWT e preenche o contexto do usuário após login.
-
-- **`components/SideMenu.js`**
-  - Exibe informações do usuário (nome, documento, email) e opções de navegação.
-
-- **`components/FloatingBottomNav.js`**
-  - Barra de navegação inferior flutuante, com ícones e labels dinâmicos.
+### **Animações**
+- **Transições suaves** entre telas
+- **Animações de loading** personalizadas
+- **Feedback visual** para interações
+- **Modais animados** com entrada/saída
 
 ---
 
-## Estilização
+## 🛡️ Segurança
 
-- **Padrão:**
-  - Todos os estilos ficam em arquivos separados na pasta `styles/`.
-  - Cada tela ou componente tem seu próprio arquivo de estilos, por exemplo:
-    - `styles/HomeStyles.js`
-    - `styles/WalletStyles.js`
-    - `styles/FloatingBottomNavStyles.js`
-  - Os estilos são criados via função para receber o tema (cores dinâmicas).
+### **Autenticação**
+- **JWT tokens** com expiração
+- **Validação** automática de sessão
+- **Logout** automático em caso de expiração
+- **Proteção** de rotas sensíveis
 
-- **Como usar:**
-  ```js
-  import createStyles from '../styles/HomeStyles';
-  const styles = createStyles();
-  // ...
-  <View style={styles.container}>
-  ```
+### **Dados Sensíveis**
+- **Ocultação** de valores monetários
+- **Controle de visibilidade** independente
+- **Criptografia** de dados locais
+- **Limpeza** automática no logout
 
-- **Temas:**
-  - O app suporta tema claro/escuro via contexto em `constants/ThemeContext.js`.
-
----
-
-## Como Criar uma Nova Tela
-
-1. **Crie o arquivo da tela em `screens/`:**
-   - Exemplo: `screens/MinhaNovaTela.js`
-
-2. **Crie o arquivo de estilos em `styles/`:**
-   - Exemplo: `styles/MinhaNovaTelaStyles.js`
-
-3. **Estruture o componente:**
-   ```js
-   import React from 'react';
-   import { View, Text } from 'react-native';
-   import createStyles from '../styles/MinhaNovaTelaStyles';
-
-   const MinhaNovaTela = () => {
-     const styles = createStyles();
-     return (
-       <View style={styles.container}>
-         <Text>Minha Nova Tela</Text>
-       </View>
-     );
-   };
-
-   export default MinhaNovaTela;
-   ```
-
-4. **Adicione a navegação para a nova tela:**
-   - Se usar React Navigation, registre a tela no seu navigator.
-   - Se usar navegação manual, adicione a lógica no componente de menu ou onde desejar.
-
-5. **Para requisições autenticadas:**
-   - Importe e use `apiRequest` normalmente.
-
-6. **Para acessar dados do usuário:**
-   - Importe e use o hook `useAuth()`.
+### **Validações**
+- **Input validation** em formulários
+- **Sanitização** de dados
+- **Tratamento de erros** robusto
+- **Feedback** de validação
 
 ---
 
-## Boas Práticas e Dicas de Manutenção
-- **Sempre use `apiRequest` para requisições autenticadas.**
-- **Para login e manipulação do token, use `authService.js`.**
-- **Para acessar dados do usuário logado, use o contexto `useAuth()`.**
-- **Para adicionar novos serviços:**
-  - Crie funções utilitárias que usem `apiRequest` com os parâmetros adequados.
-- **Para tratar erros de sessão expirada:**
-  - O tratamento já está centralizado no `apiRequest`.
-- **Para exibir dados do usuário:**
-  - Use `user.name`, `user.cpf`, `user.email` do contexto.
-- **Para garantir persistência após fechar o app:**
-  - O contexto decodifica o JWT salvo ao abrir o app e preenche o usuário automaticamente.
+## 📱 Experiência do Usuário
+
+### **Navegação Intuitiva**
+- **FloatingBottomNav** sempre acessível
+- **SideMenu** para opções avançadas
+- **Breadcrumbs** visuais
+- **Feedback** de navegação
+
+### **Performance**
+- **Lazy loading** de componentes
+- **Otimização** de imagens
+- **Cache** de dados
+- **Loading states** informativos
+
+### **Acessibilidade**
+- **Touch targets** adequados
+- **Contraste** de cores
+- **Feedback** tátil
+- **Navegação** por teclado
 
 ---
 
-## Estrutura de Pastas Relevante
-```
-services/
-  api.js            # Função genérica para requisições autenticadas
-  authService.js    # Login, armazenamento e recuperação do token JWT
-constants/
-  AuthContext.js    # Contexto global de autenticação e usuário
-screens/
-  HomeScreen.js     # Exemplo de uso do saldo dinâmico
-  WalletScreen.js   # Exemplo de uso do saldo dinâmico
-styles/
-  HomeStyles.js     # Estilos da Home
-  WalletStyles.js   # Estilos da Carteira
-  ...
-```
+## 🔄 Fluxos Principais
+
+### **Fluxo de Aporte**
+1. Usuário seleciona valor do aporte
+2. Escolhe produto de investimento
+3. Seleciona método de pagamento (PIX/Transferência)
+4. Faz upload do comprovante
+5. Confirma o aporte
+6. Recebe confirmação
+
+### **Fluxo de Resgate**
+1. Usuário acessa carteira
+2. Clica em "Resgatar"
+3. Seleciona valor ou porcentagem
+4. Confirma o resgate
+5. Recebe confirmação de sucesso
+
+### **Fluxo de Notícias**
+1. Usuário acessa notícias
+2. Filtra por categoria (opcional)
+3. Lê notícias em destaque
+4. Acessa notícia completa
+5. Compartilha (opcional)
 
 ---
 
-## Observações
-- O JWT é decodificado tanto no login quanto ao abrir o app, garantindo que os dados do usuário estejam sempre disponíveis.
-- Para requisições futuras, basta seguir o padrão do `apiRequest`.
-- Caso o backend mude o formato do JWT ou dos endpoints, basta ajustar a decodificação e os parâmetros enviados.
+## 🎯 Próximas Funcionalidades
+
+### **Planejadas**
+- [ ] **Push notifications** para atualizações
+- [ ] **Biometria** para login rápido
+- [ ] **Offline mode** para dados básicos
+- [ ] **Analytics** de uso
+- [ ] **Testes automatizados**
+- [ ] **PWA** para web
+
+### **Melhorias**
+- [ ] **Performance** otimizada
+- [ ] **Acessibilidade** aprimorada
+- [ ] **Internacionalização** (i18n)
+- [ ] **Temas customizáveis**
+- [ ] **Modo escuro** automático
 
 ---
+
+## 📞 Suporte
+
+Para dúvidas, sugestões ou problemas:
+- **Email**: suporte@rtx.com.br
+- **Telefone**: (11) 9999-9999
+- **Documentação**: [docs.rtx.com.br](https://docs.rtx.com.br)
+
+---
+
+## 📄 Licença
+
+Este projeto é proprietário da RTX Investimentos. Todos os direitos reservados.
+
+---
+
+*Desenvolvido com ❤️ pela equipe RTX*

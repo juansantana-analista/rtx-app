@@ -16,38 +16,15 @@ const createStyles = () => {
       backgroundColor: themeColors.background,
     },
     
-    // Card de Saldo
-    balanceCard: {
-      backgroundColor: themeColors.cardBackground,
-      margin: 20,
-      padding: 24,
-      borderRadius: 16,
-      shadowColor: themeColors.shadow || themeColors.black,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 6,
-      borderWidth: 1,
-      borderColor: themeColors.border || themeColors.mediumGray,
-      alignItems: 'center',
-    },
-    balanceLabel: {
-      fontSize: 14,
-      color: themeColors.textSecondary || themeColors.darkGray,
-      marginBottom: 8,
-      fontWeight: '500',
-    },
-    balanceAmount: {
-      fontSize: 28,
-      fontWeight: 'bold',
-      color: themeColors.accent || themeColors.secondary,
-      letterSpacing: -0.5,
-    },
+
 
     // Seções
     section: {
       paddingHorizontal: 20,
       marginBottom: 24,
+    },
+    firstSection: {
+      paddingTop: 20, // Espaçamento adicional da primeira seção
     },
     sectionTitle: {
       fontSize: 18,
@@ -159,6 +136,18 @@ const createStyles = () => {
       paddingVertical: 16,
     },
 
+    // Limites de Valor
+    amountLimits: {
+      alignItems: 'center',
+      marginTop: 12,
+      marginBottom: 16,
+    },
+    limitText: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      fontWeight: '500',
+    },
+
     // Validação do Valor
     amountValidation: {
       marginTop: 12,
@@ -193,6 +182,156 @@ const createStyles = () => {
       fontSize: 14,
       color: themeColors.accent || themeColors.secondary,
       fontWeight: '600',
+    },
+
+    // Métodos de Pagamento
+    paymentMethod: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      position: 'relative',
+    },
+    selectedPaymentMethod: {
+      borderColor: themeColors.accent || themeColors.secondary,
+      borderWidth: 2,
+      backgroundColor: themeColors.theme === 'dark' 
+        ? 'rgba(85, 184, 128, 0.1)' 
+        : 'rgba(85, 184, 128, 0.05)',
+    },
+    paymentIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+    },
+    paymentInfo: {
+      flex: 1,
+    },
+    paymentTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      marginBottom: 4,
+      letterSpacing: -0.1,
+    },
+    paymentSubtitle: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      marginBottom: 4,
+    },
+    paymentDescription: {
+      fontSize: 13,
+      color: themeColors.textTertiary || themeColors.darkGray,
+      lineHeight: 18,
+    },
+    instantBadge: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
+      backgroundColor: themeColors.success,
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    instantBadgeText: {
+      color: themeColors.white,
+      fontSize: 10,
+      fontWeight: 'bold',
+    },
+
+    // Dados Bancários
+    bankDataCard: {
+      backgroundColor: themeColors.lightGray,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
+    },
+    bankDataRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: themeColors.border || themeColors.mediumGray,
+    },
+    bankDataLabel: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      fontWeight: '500',
+    },
+    bankDataValue: {
+      fontSize: 14,
+      color: themeColors.text,
+      fontWeight: '600',
+    },
+    transferInstruction: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      textAlign: 'center',
+      marginBottom: 20,
+      lineHeight: 20,
+    },
+
+    // Anexar Arquivo
+    attachButton: {
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: themeColors.accent || themeColors.secondary,
+      borderStyle: 'dashed',
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    attachButtonText: {
+      fontSize: 16,
+      color: themeColors.accent || themeColors.secondary,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    attachedFileInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 12,
+      padding: 12,
+      backgroundColor: 'rgba(40, 167, 69, 0.1)',
+      borderRadius: 8,
+    },
+    attachedFileDetails: {
+      flex: 1,
+      marginHorizontal: 8,
+    },
+    attachedFileText: {
+      fontSize: 14,
+      color: themeColors.success,
+      fontWeight: '500',
+    },
+    attachedFileSize: {
+      fontSize: 12,
+      color: themeColors.success,
+      opacity: 0.8,
+      marginTop: 2,
     },
 
     // Card de Resumo
@@ -368,6 +507,126 @@ const createStyles = () => {
       fontSize: 12,
       color: themeColors.textTertiary || themeColors.darkGray,
       fontWeight: '500',
+    },
+
+    // Modal PIX
+    pixModalContent: {
+      alignItems: 'center',
+    },
+    pixStatusCard: {
+      alignItems: 'center',
+      backgroundColor: themeColors.cardBackground,
+      borderRadius: 16,
+      padding: 32,
+      marginBottom: 24,
+      width: '100%',
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    pixStatusText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    pixAmountText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: themeColors.accent || themeColors.secondary,
+      letterSpacing: -0.5,
+    },
+    pixProductText: {
+      fontSize: 16,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      fontWeight: '600',
+      marginTop: 4,
+    },
+
+    // QR Code
+    qrCodeSection: {
+      alignItems: 'center',
+      marginBottom: 24,
+      width: '100%',
+    },
+    qrCodeTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: themeColors.text,
+      marginBottom: 16,
+    },
+    qrCodeContainer: {
+      backgroundColor: themeColors.white,
+      borderRadius: 12,
+      padding: 20,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    qrCodePlaceholder: {
+      width: 200,
+      height: 200,
+      backgroundColor: themeColors.lightGray,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    // PIX Copia e Cola
+    pixCopySection: {
+      width: '100%',
+      marginBottom: 24,
+    },
+    pixCopyTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: themeColors.text,
+      marginBottom: 12,
+      textAlign: 'center',
+    },
+    pixCopyButton: {
+      backgroundColor: themeColors.lightGray,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
+    },
+    pixCopyCode: {
+      flex: 1,
+      fontSize: 12,
+      color: themeColors.text,
+      fontFamily: 'monospace',
+      marginRight: 12,
+    },
+
+    // Instruções PIX
+    pixInstructions: {
+      width: '100%',
+      backgroundColor: themeColors.lightGray,
+      borderRadius: 12,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: themeColors.border || themeColors.mediumGray,
+    },
+    instructionTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      marginBottom: 12,
+    },
+    instructionText: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      marginBottom: 8,
+      lineHeight: 20,
     },
   });
 };

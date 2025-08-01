@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
       );
       return JSON.parse(jsonPayload);
     } catch (e) {
+      console.error('❌ Erro ao decodificar JWT:', e);
       return null;
     }
   }
@@ -68,19 +69,20 @@ export const AuthProvider = ({ children }) => {
         if (isValid) {
           setToken(storedToken);
           setIsAuthenticated(true);
-          // Decodifica o JWT restaurado e popula o user
-          const decoded = decodeJWT(storedToken);
-          if (decoded) {
-            const userData = {
-              id: decoded.userid,
-              name: decoded.username,
-              email: decoded.usermail,
-              cpf: decoded.user,
-            };
-            setUser(userData);
-          } else {
-            setUser(null);
-          }
+                     // Decodifica o JWT restaurado e popula o user
+           const decoded = decodeJWT(storedToken);
+           if (decoded) {
+             const userData = {
+               id: decoded.userid,
+               name: decoded.username,
+               email: decoded.usermail,
+               cpf: decoded.user,
+               is_gn: decoded.is_gn || false,
+             };
+             setUser(userData);
+           } else {
+             setUser(null);
+           }
           // Aqui você pode buscar dados do usuário se necessário
           // const userData = await getUserData(storedToken);
           // setUser(userData);
@@ -117,40 +119,49 @@ export const AuthProvider = ({ children }) => {
       const result = await authServiceLogin(credentials);
       
       if (result.status === 'success' && result.data) {
-        // Armazena o token
+        // Decodificar o JWT
+        const decoded = decodeJWT(result.data);
+        
+        // Verificar se o dispositivo está liberado
+        if (decoded && decoded.dispositivo === false) {
+          // Dispositivo não liberado - mostrar tela de ativação
+          setIsLoading(false);
+          return { 
+            success: true, 
+            data: {
+              ...decoded,
+              token: result.data
+            },
+            requiresDeviceActivation: true 
+          };
+        }
+        
+        // Dispositivo liberado - fazer login normal
         const tokenStored = await storeToken(result.data);
         
         if (tokenStored) {
           setToken(result.data);
           setIsAuthenticated(true);
-          // Decodifica o JWT para pegar os dados reais do usuário
-          const decoded = decodeJWT(result.data);
+          
           if (decoded) {
             const userData = {
               id: decoded.userid,
               name: decoded.username,
               email: decoded.usermail,
               cpf: decoded.user,
-              // outros campos se necessário
+              is_gn: decoded.is_gn || false,
             };
             setUser(userData);
-          } else {
-            setUser(null);
           }
-          return { success: true };
+          
+          return { success: true, data: decoded };
         } else {
-          setIsAuthenticated(false);
-          setUser(null);
           return { success: false, error: 'Erro ao salvar token' };
         }
-             } else {
-         setIsAuthenticated(false);
-         setUser(null);
-         return { success: false, error: result.data || 'Credenciais inválidas' };
-       }
+      } else {
+        return { success: false, error: result.data || 'Credenciais inválidas' };
+      }
     } catch (error) {
-      setIsAuthenticated(false);
-      setUser(null);
       return { success: false, error: 'Erro de conexão' };
     } finally {
       setIsLoading(false);
@@ -160,12 +171,18 @@ export const AuthProvider = ({ children }) => {
   // Logout do usuário
   const logout = async () => {
     try {
+      console.log('Executando logout...');
       await removeToken();
       setToken(null);
       setIsAuthenticated(false);
       setUser(null);
+      console.log('Logout concluído com sucesso');
     } catch (error) {
       console.error('Erro no logout:', error);
+      // Mesmo com erro, força o logout
+      setToken(null);
+      setIsAuthenticated(false);
+      setUser(null);
     }
   };
 
@@ -200,13 +217,16 @@ export const AuthProvider = ({ children }) => {
       const interval = setInterval(async () => {
         const isValid = await checkTokenValidity(token);
         if (!isValid) {
+          console.log('Token expirado na verificação periódica - Forçando logout');
           await logout();
         }
-      }, 60000); // Verifica a cada minuto
+      }, 30000); // Verifica a cada 30 segundos
 
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, token]);
+
+
 
   useEffect(() => {
     registerGlobalLogout(logout);
