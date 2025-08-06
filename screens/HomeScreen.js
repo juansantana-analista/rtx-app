@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import { useAuth } from '../constants/AuthContext';
 import { apiRequest } from '../services/api';
+import { getNoticias } from '../services/newsService';
 import CustomHeader from '../components/CustomHeader';
 import FloatingBottomNav from '../components/FloatingBottomNav';
 import FloatingLoader from '../components/FloatingLoader';
@@ -27,6 +28,10 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
   const [activeTab, setActiveTab] = useState('home');
   const [isBalanceVisible, setIsBalanceVisible] = useState(false);
   const [balanceError, setBalanceError] = useState('');
+  const [news, setNews] = useState([]);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [newsError, setNewsError] = useState('');
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
 
   const fetchBalance = async () => {
     if (!isAuthenticated || !user?.id) {
@@ -41,8 +46,11 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
       const result = await apiRequest({
         classe: 'CarteiraRestService',
         metodo: 'getCarteirasUsuario',
-        params: { usuario_id: user.id }
+        params: { pessoa_id: user.pessoaid }
       });
+      
+
+      
       if (result.status === 'success' && result.data && result.data.length > 0) {
         setBalance(result.data[0].saldo);
         setTotalBalance(result.data[0].saldo_total);
@@ -54,7 +62,7 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     } catch (e) {
       // Se for erro de autenticação, não mostra erro na tela
       if (e.message.includes('Sessão expirada') || e.message.includes('Token') || e.message.includes('login')) {
-        console.log('Erro de autenticação ao buscar saldo:', e.message);
+        // Erro de autenticação ao buscar saldo
         // O logout será tratado automaticamente pelo apiRequest
         return;
       }
@@ -64,41 +72,90 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     }
   };
 
+  const fetchNews = async () => {
+    if (!isAuthenticated) {
+      setNews([]);
+      setNewsError('');
+      setIsLoadingNews(false);
+      return;
+    }
+    setIsLoadingNews(true);
+    setNewsError('');
+    try {
+      const newsData = await getNoticias();
+      // Pegar apenas as primeiras 4 notícias para a prévia
+      setNews(newsData.slice(0, 4));
+    } catch (error) {
+      setNewsError('Erro ao carregar notícias');
+      console.error('Erro ao buscar notícias:', error);
+    } finally {
+      setIsLoadingNews(false);
+    }
+  };
+
   useEffect(() => {
     fetchBalance();
+    fetchNews();
   }, [user, isAuthenticated]);
 
   const handleRefreshBalance = () => {
     fetchBalance();
   };
 
-  const menuItems = [
-    { 
-      id: 1, 
-      title: 'Aporte', 
-      icon: 'add-circle', 
+    const allMenuItems = [
+    {
+      id: 1,
+      title: 'Aporte',
+      icon: 'add-circle',
       badge: 'Novo',
       onPress: () => onNavigate && onNavigate('aportes')
     },
-    { 
-      id: 2, 
-      title: 'Notícias', 
-      icon: 'newspaper',
-      onPress: () => onNavigate && onNavigate('news')
+    {
+      id: 2,
+      title: 'TSX Locadora',
+      icon: 'car-sport',
+      onPress: () => onNavigate && onNavigate('tsxLocadora')
     },
-    { 
-      id: 3, 
-      title: 'Escritórios', 
+    {
+      id: 3,
+      title: 'Escritórios',
       icon: 'business',
       onPress: () => onNavigate && onNavigate('offices')
     },
-    { 
-      id: 4, 
-      title: 'Mostrar mais', 
-      icon: 'ellipsis-horizontal',
-      onPress: () => console.log('Mostrar mais')
+    {
+      id: 4,
+      title: 'Notícias',
+      icon: 'newspaper',
+      onPress: () => onNavigate && onNavigate('news')
+    },
+    {
+      id: 5,
+      title: 'Meus Clientes',
+      icon: 'people',
+      onPress: () => onNavigate && onNavigate('myClients')
+    },
+    {
+      id: 6,
+      title: 'Shop',
+      icon: 'bag',
+      onPress: () => onNavigate && onNavigate('shop')
+    },
+    {
+      id: 7,
+      title: 'Relatórios',
+      icon: 'document-text',
+      onPress: () => console.log('Relatórios')
+    },
+    {
+      id: 8,
+      title: showMoreOptions ? 'Mostrar menos' : 'Mostrar mais',
+      icon: showMoreOptions ? 'chevron-up' : 'ellipsis-horizontal',
+      onPress: () => setShowMoreOptions(!showMoreOptions)
     },
   ];
+
+  // Mostrar apenas 3 itens + botão "Mostrar mais" quando não expandido
+  const menuItems = showMoreOptions ? allMenuItems : allMenuItems.slice(0, 3).concat(allMenuItems[7]);
 
   // Dados mockados dos investimentos do usuário
   const userInvestments = [
@@ -120,41 +177,25 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     }
   ];
 
-  // Dados mockados das notícias para prévia
-  const previewNews = [
-    {
-      id: 1,
-      title: 'Dólar cai para menor patamar em 3 meses',
-      category: 'Mercado',
-      publishedAt: '2024-01-15T10:30:00',
-      readTime: '3 min',
-      image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop'
-    },
-    {
-      id: 2,
-      title: 'Petrobras anuncia novo plano de investimentos',
-      category: 'Empresas',
-      publishedAt: '2024-01-15T09:15:00',
-      readTime: '5 min',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
-    },
-    {
-      id: 3,
-      title: 'Taxa Selic mantida em 11,75% ao ano',
-      category: 'Economia',
-      publishedAt: '2024-01-15T08:45:00',
-      readTime: '4 min',
-      image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=200&fit=crop'
-    },
-    {
-      id: 4,
-      title: 'Bitcoin atinge nova máxima do ano',
-      category: 'Cripto',
-      publishedAt: '2024-01-15T07:20:00',
-      readTime: '2 min',
-      image: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=200&fit=crop'
+  // Função para formatar a data das notícias
+  const formatNewsDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+      
+      if (diffInHours < 1) {
+        return 'Agora mesmo';
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h atrás`;
+      } else {
+        const diffInDays = Math.floor(diffInHours / 24);
+        return `${diffInDays}d atrás`;
+      }
+    } catch (error) {
+      return 'Data não disponível';
     }
-  ];
+  };
 
   const rightActions = [
     { 
@@ -163,7 +204,7 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     },
     { 
       icon: 'notifications-outline', 
-      onPress: () => console.log('Notifications') 
+      onPress: () => onNavigate && onNavigate('notifications') 
     }
   ];
 
@@ -231,21 +272,7 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
     });
   };
 
-  // Formata a data das notícias
-  const formatNewsDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) {
-      return 'Agora';
-    } else if (diffInHours < 24) {
-      return `${diffInHours}h atrás`;
-    } else {
-      const diffInDays = Math.floor(diffInHours / 24);
-      return `${diffInDays}d atrás`;
-    }
-  };
+
 
   // Função para lidar com o clique no card de investimento
   const handleInvestmentPress = (investment) => {
@@ -256,9 +283,8 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
 
   // Função para lidar com o clique nas notícias
   const handleNewsPress = (news) => {
-    console.log('Notícia clicada:', news);
-    // Navegar para a tela de notícias
-    onNavigate && onNavigate('news');
+    console.log('Notícia clicada:', news.titulo);
+    onNavigate && onNavigate('newsDetail', { news });
   };
 
   return (
@@ -319,7 +345,7 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
                 <Ionicons 
                   name={item.icon} 
                   size={24} 
-                  color={item.id === 4 ? themeColors.darkGray : themeColors.secondary} 
+                  color={item.id === 8 ? themeColors.darkGray : themeColors.secondary} 
                 />
                 {item.badge && (
                   <View style={styles.badge}>
@@ -402,39 +428,53 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
             </TouchableOpacity>
           </View>
           
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.newsScrollContent}
-          >
-            {previewNews.map((news) => (
-              <TouchableOpacity 
-                key={news.id} 
-                style={styles.newsCard}
-                onPress={() => handleNewsPress(news)}
-                activeOpacity={0.7}
-              >
-                <Image 
-                  source={{ uri: news.image }} 
-                  style={styles.newsImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.newsCardContent}>
-                  <View style={styles.newsCardHeader}>
-                    <Text style={styles.newsCategory}>{news.category}</Text>
-                    <Text style={styles.newsTime}>{formatNewsDate(news.publishedAt)}</Text>
+          {isLoadingNews ? (
+            <View style={styles.newsLoading}>
+              <Text style={styles.newsLoadingText}>Carregando notícias...</Text>
+            </View>
+          ) : newsError ? (
+            <View style={styles.newsError}>
+              <Text style={styles.newsErrorText}>{newsError}</Text>
+            </View>
+          ) : news.length > 0 ? (
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.newsScrollContent}
+            >
+              {news.map((newsItem) => (
+                <TouchableOpacity 
+                  key={newsItem.id} 
+                  style={styles.newsCard}
+                  onPress={() => handleNewsPress(newsItem)}
+                  activeOpacity={0.7}
+                >
+                  <Image 
+                    source={{ uri: newsItem.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop' }} 
+                    style={styles.newsImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.newsCardContent}>
+                    <View style={styles.newsCardHeader}>
+                      <Text style={styles.newsCategory}>Notícia</Text>
+                      <Text style={styles.newsTime}>{formatNewsDate(newsItem.publicado_em)}</Text>
+                    </View>
+                    <Text style={styles.newsTitle} numberOfLines={2}>
+                      {newsItem.titulo}
+                    </Text>
+                    <View style={styles.newsCardFooter}>
+                      <Text style={styles.newsReadTime}>{newsItem.tempo_leitura}</Text>
+                      <Ionicons name="chevron-forward" size={16} color={themeColors.darkGray} />
+                    </View>
                   </View>
-                  <Text style={styles.newsTitle} numberOfLines={2}>
-                    {news.title}
-                  </Text>
-                  <View style={styles.newsCardFooter}>
-                    <Text style={styles.newsReadTime}>{news.readTime}</Text>
-                    <Ionicons name="chevron-forward" size={16} color={themeColors.darkGray} />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.newsEmpty}>
+              <Text style={styles.newsEmptyText}>Nenhuma notícia disponível</Text>
+            </View>
+          )}
         </View>
 
         {/* Espaçamento para o nav flutuante */}

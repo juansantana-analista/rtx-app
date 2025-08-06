@@ -26,7 +26,6 @@ class DeviceService {
       const existingUUID = await AsyncStorage.getItem(DEVICE_UUID_KEY);
       
       if (existingUUID) {
-        console.log('🔐 UUID do dispositivo recuperado:', existingUUID);
         return existingUUID;
       }
       
@@ -36,10 +35,9 @@ class DeviceService {
       // Salvar no storage
       await AsyncStorage.setItem(DEVICE_UUID_KEY, newUUID);
       
-      console.log('🔐 Novo UUID do dispositivo gerado:', newUUID);
       return newUUID;
     } catch (error) {
-      console.error('❌ Erro ao gerenciar UUID do dispositivo:', error);
+      // Erro ao gerenciar UUID do dispositivo
       throw error;
     }
   }
@@ -52,10 +50,9 @@ class DeviceService {
     try {
       const newUUID = generateUUID();
       await AsyncStorage.setItem(DEVICE_UUID_KEY, newUUID);
-      console.log('🔐 UUID do dispositivo regenerado:', newUUID);
       return newUUID;
     } catch (error) {
-      console.error('❌ Erro ao regenerar UUID do dispositivo:', error);
+      // Erro ao regenerar UUID do dispositivo
       throw error;
     }
   }
@@ -66,9 +63,8 @@ class DeviceService {
   static async clearDeviceUUID() {
     try {
       await AsyncStorage.removeItem(DEVICE_UUID_KEY);
-      console.log('🔐 UUID do dispositivo removido');
     } catch (error) {
-      console.error('❌ Erro ao remover UUID do dispositivo:', error);
+      // Erro ao remover UUID do dispositivo
       throw error;
     }
   }
@@ -82,7 +78,7 @@ class DeviceService {
       const uuid = await AsyncStorage.getItem(DEVICE_UUID_KEY);
       return !!uuid;
     } catch (error) {
-      console.error('❌ Erro ao verificar UUID do dispositivo:', error);
+      // Erro ao verificar UUID do dispositivo
       return false;
     }
   }

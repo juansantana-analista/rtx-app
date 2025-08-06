@@ -27,7 +27,7 @@ export const useApiRequest = (onAuthError = null) => {
       if (err.message.includes('Sessão expirada') || 
           err.message.includes('Token') || 
           err.message.includes('login')) {
-        console.log('Erro de autenticação detectado:', err.message);
+        // Erro de autenticação detectado
         if (onAuthError) {
           onAuthError(err);
         }

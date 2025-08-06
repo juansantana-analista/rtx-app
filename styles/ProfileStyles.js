@@ -3,7 +3,7 @@ import { useTheme } from '../constants/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
-const createStyles = () => {
+const createStyles = (showFloatingNav = true) => {
   const { themeColors } = useTheme();
 
   return StyleSheet.create({
@@ -150,7 +150,6 @@ const createStyles = () => {
       alignItems: 'center',
       paddingHorizontal: 20,
       paddingVertical: 32,
-      marginBottom: 20,
     },
     appVersion: {
       fontSize: 16,

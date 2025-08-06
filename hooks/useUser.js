@@ -35,7 +35,7 @@ export const useUser = () => {
 
       // Verifica se o token está expirado
       if (isTokenExpired(token)) {
-        console.log('Token expirado');
+        // Token expirado
         setUserInfo({
           user: '',
           userid: '',

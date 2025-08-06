@@ -19,7 +19,7 @@ const isTokenExpired = (token) => {
     const currentTime = Date.now() / 1000;
     return payload.exp < currentTime;
   } catch (error) {
-    console.error('Erro ao verificar expiração do token:', error);
+    // Erro ao verificar expiração do token
     return true; // Considera como expirado se não conseguir decodificar
   }
 };
@@ -32,7 +32,6 @@ api.interceptors.response.use(
   async (error) => {
     // Se receber 401 (Unauthorized), força logout
     if (error.response && error.response.status === 401) {
-      console.log('Token expirado ou inválido - Forçando logout');
       forceGlobalLogout();
     }
     
@@ -54,14 +53,12 @@ export async function apiRequest({ classe, metodo, params = {} }) {
   // Recupera o token JWT salvo
   const token = await AsyncStorage.getItem('@RTX:authToken');
   if (!token) {
-    console.log('Token não encontrado - Forçando logout');
     forceGlobalLogout();
     throw new Error('Token não encontrado. Faça login novamente.');
   }
 
   // Verifica se o token expirou antes de fazer a requisição
   if (isTokenExpired(token)) {
-    console.log('Token expirado - Forçando logout');
     forceGlobalLogout();
     throw new Error('Sessão expirada. Faça login novamente.');
   }
@@ -72,6 +69,8 @@ export async function apiRequest({ classe, metodo, params = {} }) {
     method: metodo,
     ...params
   };
+
+
 
   try {
     // Faz a requisição
@@ -91,14 +90,12 @@ export async function apiRequest({ classe, metodo, params = {} }) {
         (data.data.includes('Signature verification failed') || 
          data.data.includes('Token expired') ||
          data.data.includes('Invalid token'))) {
-      console.log('Token inválido na resposta - Forçando logout');
       forceGlobalLogout();
       throw new Error('Sessão expirada. Faça login novamente.');
     }
 
     // Verifica se recebeu 401
     if (response.status === 401) {
-      console.log('Status 401 recebido - Forçando logout');
       forceGlobalLogout();
       throw new Error('Sessão expirada. Faça login novamente.');
     }
@@ -112,7 +109,6 @@ export async function apiRequest({ classe, metodo, params = {} }) {
     
     // Para outros erros, verifica se o token ainda é válido
     if (token && isTokenExpired(token)) {
-      console.log('Token expirado durante requisição - Forçando logout');
       forceGlobalLogout();
       throw new Error('Sessão expirada. Faça login novamente.');
     }

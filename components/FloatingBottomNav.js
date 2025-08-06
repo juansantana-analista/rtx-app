@@ -42,7 +42,7 @@ const FloatingBottomNav = ({
       iconActive: 'bag',
       label: 'Shop',
       onPress: () => onTabPress && onTabPress('shop'),
-      hasNotification: true, // Exemplo de notificação
+      hasNotification: false, // Removido notificação de exemplo
     },
     {
       id: 'profile',

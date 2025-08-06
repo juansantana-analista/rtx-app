@@ -8,16 +8,17 @@ import {
   Image,
   Alert,
 } from 'react-native';
+
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import { useAuth } from '../constants/AuthContext';
 import CustomHeader from '../components/CustomHeader';
 import createStyles from '../styles/ProfileStyles';
 
-const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
+const ProfileScreen = ({ onBack, showFloatingNav = true, onNavigate }) => {
   const { theme, themeColors, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
-  const styles = createStyles();
+  const styles = createStyles(showFloatingNav);
 
   // Função para gerar iniciais do nome
   const getInitials = (name) => {
@@ -55,14 +56,28 @@ const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
       title: 'Notificações',
       subtitle: 'Configurar alertas e comunicações',
       icon: 'notifications-outline',
-      onPress: () => console.log('Notificações')
+      onPress: () => onNavigate && onNavigate('notifications')
     },
     {
       id: 'privacy',
       title: 'Privacidade',
-      subtitle: 'Controle de dados e privacidade',
+      subtitle: 'Política de privacidade e dados',
       icon: 'lock-closed-outline',
-      onPress: () => console.log('Privacidade')
+      onPress: () => {
+        Alert.alert(
+          'Política de Privacidade',
+          'Deseja abrir nossa política de privacidade?',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { 
+              text: 'Abrir', 
+              onPress: () => {
+                Linking.openURL('https://rtx.tecskill.com.br/politica_privacidade.php');
+              }
+            }
+          ]
+        );
+      }
     },
     {
       id: 'theme',
@@ -91,13 +106,6 @@ const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
   // Configurações da conta
   const accountOptions = [
     {
-      id: 'backup',
-      title: 'Backup de Dados',
-      subtitle: 'Fazer backup das suas informações',
-      icon: 'cloud-upload-outline',
-      onPress: () => console.log('Backup')
-    },
-    {
       id: 'logout',
       title: 'Sair da Conta',
       subtitle: 'Fazer logout do aplicativo',
@@ -119,7 +127,7 @@ const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
   const rightActions = [
     { 
       icon: 'notifications-outline', 
-      onPress: () => console.log('Notificações') 
+      onPress: () => onNavigate && onNavigate('notifications') 
     }
   ];
 
@@ -241,10 +249,12 @@ const ProfileScreen = ({ onBack, showFloatingNav = true }) => {
         </View>
 
         {/* Informações do App */}
-        <View style={styles.appInfo}>
-          <Text style={styles.appVersion}>RTX App v1.0.0</Text>
-          <Text style={styles.appCopyright}>© 2025 RTX Operações</Text>
-        </View>
+         <View style={styles.appInfo}>
+           <Text style={styles.appVersion}>RTX Operações v1.0.0</Text>
+           <Text style={styles.appCopyright}>© 2025 RTX Operações</Text>
+         </View>
+        {/* Espaçamento final */}
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );

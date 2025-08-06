@@ -53,8 +53,11 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
       const result = await apiRequest({
         classe: 'CarteiraRestService',
         metodo: 'getCarteirasUsuario',
-        params: { usuario_id: user.id }
+        params: { pessoa_id: user.pessoaid }
       });
+      
+
+      
       if (result.status === 'success' && result.data && result.data.length > 0) {
         setBalance(result.data[0].saldo);
         setTotalBalance(result.data[0].saldo_total);
@@ -66,7 +69,7 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
     } catch (e) {
       // Se for erro de autenticação, não mostra erro na tela
       if (e.message.includes('Sessão expirada') || e.message.includes('Token') || e.message.includes('login')) {
-        console.log('Erro de autenticação ao buscar saldo:', e.message);
+        // Erro de autenticação ao buscar saldo
         // O logout será tratado automaticamente pelo apiRequest
         return;
       }
@@ -398,7 +401,7 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
       console.log('Botão de impressão clicado no header!');
       handlePrintExtract();
     }},
-    { icon: 'notifications-outline', onPress: () => console.log('Notifications') }
+    { icon: 'notifications-outline', onPress: () => onNavigate && onNavigate('notifications') }
   ];
 
   return (

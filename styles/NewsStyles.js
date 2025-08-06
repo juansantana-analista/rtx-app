@@ -142,6 +142,44 @@ const createStyles = () => {
       color: themeColors.textSecondary || themeColors.darkGray,
       fontWeight: '500',
     },
+    // Estilos para estados de loading, erro e vazio
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 40,
+    },
+    loadingText: {
+      fontSize: 16,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      textAlign: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 40,
+    },
+    errorText: {
+      fontSize: 16,
+      color: themeColors.error,
+      textAlign: 'center',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      textAlign: 'center',
+    },
+    newsImage: {
+      width: '100%',
+      height: '100%',
+    },
   });
 };
 

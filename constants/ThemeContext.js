@@ -37,12 +37,12 @@ export const ThemeProvider = ({ children }) => {
             })
             .catch((error) => {
               // Se der erro (como edge-to-edge), usa configuração estática
-              console.log('Usando configuração estática da navigation bar');
+              // Usando configuração estática da navigation bar
             });
           
         } catch (requireError) {
           // expo-navigation-bar não disponível, usa apenas configuração estática
-          console.log('Navigation bar configurada via app.json');
+          // Navigation bar configurada via app.json
         }
 
       } catch (error) {

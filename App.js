@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './constants/ThemeContext';
 import { AuthProvider, useAuth } from './constants/AuthContext';
 import LoginScreen from './screens/LoginScreen';
+import DeviceValidationScreen from './screens/DeviceValidationScreen';
 import HomeScreen from './screens/HomeScreen';
 import WalletScreen from './screens/WalletScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AportesScreen from './screens/AportesScreen';
 import InvestmentsScreen from './screens/InvestmentsScreen';
 import NewsScreen from './screens/NewsScreen';
+import NewsDetailScreen from './screens/NewsDetailScreen';
+import ShopScreen from './screens/ShopScreen';
+import NotificationsScreen from './screens/NotificationsScreen';
+import NotificationDetailScreen from './screens/NotificationDetailScreen';
+import TSXLocadoraScreen from './screens/TSXLocadoraScreen';
+import VehicleDetailScreen from './screens/VehicleDetailScreen';
 import ExtractPdfScreen from './screens/ExtractPdfScreen';
 import OfficesScreen from './screens/OfficesScreen';
 import MyClientsScreen from './screens/MyClientsScreen';
@@ -23,13 +30,23 @@ import DeviceService from './services/deviceService';
 
 // Componente principal que usa autenticação
 const AppContent = () => {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { 
+    isAuthenticated, 
+    isLoading, 
+    logout, 
+    deviceValidated, 
+    needsDeviceValidation,
+    hasFace,
+    user
+  } = useAuth();
+  
   const [currentScreen, setCurrentScreen] = useState('home');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [navigationParams, setNavigationParams] = useState(null);
   const [deviceUUID, setDeviceUUID] = useState(null);
+  const [needsFaceRegistration, setNeedsFaceRegistration] = useState(false);
 
   // Inicialização do UUID do dispositivo
   useEffect(() => {
@@ -37,7 +54,7 @@ const AppContent = () => {
       try {
         const uuid = await DeviceService.getDeviceUUID();
         setDeviceUUID(uuid);
-        console.log('📱 UUID do dispositivo inicializado:', uuid);
+        // UUID do dispositivo inicializado
       } catch (error) {
         console.error('❌ Erro ao inicializar UUID do dispositivo:', error);
       }
@@ -45,6 +62,18 @@ const AppContent = () => {
 
     initializeDeviceUUID();
   }, []);
+
+  // Verificar se precisa de cadastro de face quando o usuário está autenticado
+  useEffect(() => {
+    if (isAuthenticated && user && needsDeviceValidation) {
+      // Se o usuário não tem face cadastrada, precisa fazer cadastro
+      // Se tem face cadastrada, precisa apenas validar
+      const needsRegistration = !hasFace;
+      setNeedsFaceRegistration(needsRegistration);
+    } else {
+      setNeedsFaceRegistration(false);
+    }
+  }, [isAuthenticated, user, needsDeviceValidation, hasFace]);
 
   // Configuração inicial da Navigation Bar
   useEffect(() => {
@@ -110,7 +139,12 @@ const AppContent = () => {
     return <LoginScreen />;
   }
 
-  // Se está autenticado, mostra o app principal
+  // Se está autenticado mas precisa validar dispositivo, mostra tela de validação
+  if (isAuthenticated && needsDeviceValidation && !deviceValidated) {
+    return <DeviceValidationScreen isFaceRegistration={needsFaceRegistration} />;
+  }
+
+  // Se está autenticado e dispositivo validado, mostra o app principal
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
@@ -142,6 +176,7 @@ const AppContent = () => {
           <ProfileScreen 
             onBack={() => handleNavigation('home')}
             showFloatingNav={false}
+            onNavigate={handleNavigation}
           />
         );
       case 'aportes':
@@ -169,6 +204,54 @@ const AppContent = () => {
         return (
           <NewsScreen 
             onBack={() => handleNavigation('home')}
+            onNavigate={handleNavigation}
+            showFloatingNav={false}
+          />
+        );
+      case 'newsDetail':
+        return (
+          <NewsDetailScreen 
+            onBack={() => handleNavigation('news')}
+            route={{ params: navigationParams }}
+            showFloatingNav={false}
+          />
+        );
+      case 'shop':
+        return (
+          <ShopScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+          />
+        );
+      case 'notifications':
+        return (
+          <NotificationsScreen 
+            onBack={() => handleNavigation('home')}
+            showFloatingNav={false}
+            onNavigate={handleNavigation}
+          />
+        );
+      case 'notificationDetail':
+        return (
+          <NotificationDetailScreen 
+            route={{ params: navigationParams }}
+            onBack={() => handleNavigation('notifications')}
+            showFloatingNav={false}
+          />
+        );
+      case 'tsxLocadora':
+        return (
+          <TSXLocadoraScreen 
+            onBack={() => handleNavigation('home')}
+            onNavigate={handleNavigation}
+            showFloatingNav={false}
+          />
+        );
+      case 'vehicleDetail':
+        return (
+          <VehicleDetailScreen 
+            route={{ params: navigationParams }}
+            onBack={() => handleNavigation('tsxLocadora')}
             showFloatingNav={false}
           />
         );
@@ -279,7 +362,7 @@ const AppContent = () => {
   };
 
   // Determinar se deve mostrar a navegação flutuante
-  const shouldShowFloatingNav = isAuthenticated;
+  const shouldShowFloatingNav = isAuthenticated && deviceValidated;
 
   // Se não está autenticado, mostrar tela de login
   if (!isAuthenticated) {
@@ -305,12 +388,19 @@ const AppContent = () => {
       )}
 
       {/* Navegação Flutuante Global */}
-      {shouldShowFloatingNav && 
-       currentScreen !== 'addBalance' && 
-       currentScreen !== 'aportes' && 
-       currentScreen !== 'myClients' && 
-       currentScreen !== 'clientDetails' && 
-       !isWalletModalOpen && (
+                  {shouldShowFloatingNav &&
+             currentScreen !== 'addBalance' &&
+             currentScreen !== 'aportes' &&
+             currentScreen !== 'myClients' &&
+             currentScreen !== 'clientDetails' &&
+             currentScreen !== 'notifications' &&
+             currentScreen !== 'notificationDetail' &&
+             currentScreen !== 'news' &&
+             currentScreen !== 'newsDetail' &&
+             currentScreen !== 'offices' &&
+             currentScreen !== 'tsxLocadora' &&
+             currentScreen !== 'vehicleDetail' &&
+             !isWalletModalOpen && (
         <FloatingBottomNav
           activeTab={activeTab}
           onTabPress={handleTabPress}

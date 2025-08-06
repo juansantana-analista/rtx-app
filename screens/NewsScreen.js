@@ -10,85 +10,71 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
 import { useAuth } from '../constants/AuthContext';
+import { getNoticias, getCategorias, getNoticiasPorCategoria } from '../services/newsService';
 import CustomHeader from '../components/CustomHeader';
+import FloatingLoader from '../components/FloatingLoader';
 import createStyles from '../styles/NewsStyles';
 
-const NewsScreen = ({ onBack, showFloatingNav = true }) => {
+const NewsScreen = ({ onBack, onNavigate, showFloatingNav = true }) => {
   const { themeColors } = useTheme();
   const { user, isAuthenticated } = useAuth();
   const styles = createStyles();
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('todas');
+  const [news, setNews] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState('');
 
-  // Dados mockados das notícias
-  const newsData = [
-    {
-      id: 1,
-      title: 'Ibovespa fecha em alta de 2,3% com dados positivos da economia',
-      summary: 'O principal índice da bolsa brasileira registrou forte recuperação nesta terça-feira, impulsionado por indicadores econômicos que superaram as expectativas do mercado.',
-      category: 'mercado',
-      publishedAt: '2024-01-15T10:30:00Z',
-      readTime: '3 min',
-      image: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=Ibovespa',
-      featured: true,
-    },
-    {
-      id: 2,
-      title: 'Dólar cai para R$ 4,85 com melhora no cenário externo',
-      summary: 'A moeda americana registrou queda de 1,2% frente ao real, influenciada por dados positivos da economia global e redução da aversão ao risco.',
-      category: 'cambio',
-      publishedAt: '2024-01-15T09:15:00Z',
-      readTime: '2 min',
-      image: 'https://via.placeholder.com/300x200/7B68EE/FFFFFF?text=Dolar',
-    },
-    {
-      id: 3,
-      title: 'Tesouro Direto: Títulos públicos registram forte demanda',
-      summary: 'Investidores buscaram refúgio em títulos públicos, com volume de aplicações aumentando 15% em relação ao mês anterior.',
-      category: 'investimentos',
-      publishedAt: '2024-01-15T08:45:00Z',
-      readTime: '4 min',
-      image: 'https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Tesouro',
-    },
-    {
-      id: 4,
-      title: 'Petrobras anuncia novo plano de investimentos',
-      summary: 'A estatal apresentou estratégia de investimentos de R$ 102 bilhões para os próximos 5 anos, focando em energias renováveis.',
-      category: 'empresas',
-      publishedAt: '2024-01-14T16:20:00Z',
-      readTime: '5 min',
-      image: 'https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Petrobras',
-    },
-    {
-      id: 5,
-      title: 'Bitcoin atinge máxima do ano com adoção institucional',
-      summary: 'A criptomoeda registrou valorização de 8% em 24 horas, impulsionada por notícias sobre adoção por grandes instituições financeiras.',
-      category: 'criptomoedas',
-      publishedAt: '2024-01-14T14:30:00Z',
-      readTime: '3 min',
-      image: 'https://via.placeholder.com/300x200/45B7D1/FFFFFF?text=Bitcoin',
-    },
-    {
-      id: 6,
-      title: 'BC mantém Selic em 11,75% ao ano',
-      summary: 'O Comitê de Política Monetária decidiu manter a taxa básica de juros inalterada, conforme esperado pelo mercado.',
-      category: 'economia',
-      publishedAt: '2024-01-14T12:00:00Z',
-      readTime: '2 min',
-      image: 'https://via.placeholder.com/300x200/96CEB4/FFFFFF?text=BC',
-    },
-  ];
+  // Função para carregar notícias
+  const loadNews = async (categoryId = null) => {
+    if (!isAuthenticated) {
+      setNews([]);
+      setError('');
+      return;
+    }
 
-  // Categorias disponíveis
-  const categories = [
-    { id: 'todas', title: 'Todas', icon: 'grid' },
-    { id: 'mercado', title: 'Mercado', icon: 'trending-up' },
-    { id: 'economia', title: 'Economia', icon: 'analytics' },
-    { id: 'investimentos', title: 'Investimentos', icon: 'wallet' },
-    { id: 'empresas', title: 'Empresas', icon: 'business' },
-    { id: 'criptomoedas', title: 'Cripto', icon: 'logo-bitcoin' },
-  ];
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const newsData = await getNoticias(categoryId);
+      setNews(newsData);
+    } catch (error) {
+      setError('Erro ao carregar notícias');
+      console.error('Erro ao buscar notícias:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para carregar categorias
+  const loadCategories = async () => {
+    if (!isAuthenticated) {
+      setCategories([]);
+      return;
+    }
+
+    try {
+      const categoriesData = await getCategorias();
+      // Adicionar categoria "Todas" no início
+      const allCategories = [
+        { id: 'todas', nome: 'Todas', icon: 'grid' },
+        ...categoriesData
+      ];
+      setCategories(allCategories);
+    } catch (error) {
+      console.error('Erro ao buscar categorias:', error);
+    }
+  };
+
+  // Carregar dados na inicialização
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadCategories();
+      loadNews();
+    }
+  }, [isAuthenticated]);
 
   // Formata a data de publicação
   const formatPublishedDate = (dateString) => {
@@ -106,23 +92,33 @@ const NewsScreen = ({ onBack, showFloatingNav = true }) => {
     }
   };
 
-  // Filtra notícias por categoria
-  const filteredNews = selectedCategory === 'todas' 
-    ? newsData 
-    : newsData.filter(news => news.category === selectedCategory);
+
 
   // Função para atualizar as notícias
   const onRefresh = async () => {
     setRefreshing(true);
-    // Simular carregamento
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setRefreshing(false);
+    try {
+      await Promise.all([
+        loadCategories(),
+        loadNews(selectedCategory === 'todas' ? null : selectedCategory)
+      ]);
+    } catch (error) {
+      console.error('Erro ao atualizar notícias:', error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   // Função para lidar com o clique na notícia
   const handleNewsPress = (news) => {
-    console.log('Notícia clicada:', news.title);
-    // Aqui você pode navegar para uma tela de detalhes da notícia
+    console.log('Notícia clicada:', news.titulo);
+    onNavigate('newsDetail', { news });
+  };
+
+  // Função para lidar com mudança de categoria
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+    loadNews(categoryId === 'todas' ? null : categoryId);
   };
 
   const rightActions = [
@@ -171,11 +167,11 @@ const NewsScreen = ({ onBack, showFloatingNav = true }) => {
                   styles.categoryButton,
                   selectedCategory === category.id && styles.categoryButtonActive
                 ]}
-                onPress={() => setSelectedCategory(category.id)}
+                onPress={() => handleCategoryChange(category.id)}
                 activeOpacity={0.7}
               >
                 <Ionicons 
-                  name={category.icon} 
+                  name={category.icon || 'grid'} 
                   size={16} 
                   color={selectedCategory === category.id ? themeColors.white : themeColors.text} 
                 />
@@ -183,7 +179,7 @@ const NewsScreen = ({ onBack, showFloatingNav = true }) => {
                   styles.categoryText,
                   selectedCategory === category.id && styles.categoryTextActive
                 ]}>
-                  {category.title}
+                  {category.nome}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -192,56 +188,78 @@ const NewsScreen = ({ onBack, showFloatingNav = true }) => {
 
         {/* Lista de Notícias */}
         <View style={styles.newsContainer}>
-          {filteredNews.map((news, index) => (
-            <TouchableOpacity
-              key={news.id}
-              style={[
-                styles.newsCard,
-                news.featured && styles.featuredNewsCard
-              ]}
-              onPress={() => handleNewsPress(news)}
-              activeOpacity={0.7}
-            >
-              {/* Imagem da notícia */}
-              <View style={styles.newsImageContainer}>
-                <View style={styles.newsImagePlaceholder}>
-                  <Ionicons name="newspaper" size={40} color={themeColors.darkGray} />
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Carregando notícias...</Text>
+            </View>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : news.length > 0 ? (
+            news.map((newsItem, index) => (
+                          <TouchableOpacity
+                key={newsItem.id}
+                style={[
+                  styles.newsCard,
+                  newsItem.em_destaque === '1' && styles.featuredNewsCard
+                ]}
+                onPress={() => handleNewsPress(newsItem)}
+                activeOpacity={0.7}
+              >
+                              {/* Imagem da notícia */}
+                <View style={styles.newsImageContainer}>
+                  {newsItem.image_url ? (
+                    <Image 
+                      source={{ uri: newsItem.image_url }} 
+                      style={styles.newsImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.newsImagePlaceholder}>
+                      <Ionicons name="newspaper" size={40} color={themeColors.darkGray} />
+                    </View>
+                  )}
+                  {newsItem.em_destaque === '1' && (
+                    <View style={styles.featuredBadge}>
+                      <Text style={styles.featuredBadgeText}>Destaque</Text>
+                    </View>
+                  )}
                 </View>
-                {news.featured && (
-                  <View style={styles.featuredBadge}>
-                    <Text style={styles.featuredBadgeText}>Destaque</Text>
-                  </View>
-                )}
-              </View>
 
               {/* Conteúdo da notícia */}
               <View style={styles.newsContent}>
                 <View style={styles.newsHeader}>
                   <Text style={styles.newsCategory}>
-                    {categories.find(cat => cat.id === news.category)?.title}
+                    {categories.find(cat => cat.id === newsItem.noticias_categoria_id)?.nome || 'Notícia'}
                   </Text>
                   <Text style={styles.newsTime}>
-                    {formatPublishedDate(news.publishedAt)}
+                    {formatPublishedDate(newsItem.publicado_em)}
                   </Text>
                 </View>
 
                 <Text style={styles.newsTitle} numberOfLines={2}>
-                  {news.title}
+                  {newsItem.titulo}
                 </Text>
 
                 <Text style={styles.newsSummary} numberOfLines={3}>
-                  {news.summary}
+                  {newsItem.resumo}
                 </Text>
 
                 <View style={styles.newsFooter}>
                   <Text style={styles.newsReadTime}>
-                    {news.readTime} de leitura
+                    {newsItem.tempo_leitura} de leitura
                   </Text>
                   <Ionicons name="chevron-forward" size={16} color={themeColors.darkGray} />
                 </View>
               </View>
             </TouchableOpacity>
-          ))}
+          ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Nenhuma notícia encontrada</Text>
+            </View>
+          )}
         </View>
 
         {/* Espaçamento final */}

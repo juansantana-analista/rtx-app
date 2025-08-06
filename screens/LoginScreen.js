@@ -71,12 +71,12 @@ const LoginScreen = () => {
           // Salva documento e senha para login biométrico futuro
           await AsyncStorage.setItem(LOGIN_DATA_KEY, JSON.stringify({ documento: docNumbers, password }));
           // Login bem-sucedido - o AuthContext já gerencia o estado
-          console.log('Login realizado com sucesso!');
+          // Login realizado com sucesso!
         } else {
           setLoginError(result.error || 'Credenciais inválidas');
         }
       } catch (error) {
-        console.error('Erro na requisição de login:', error);
+        // Erro na requisição de login
         setLoginError('Erro de conexão com o servidor');
       } finally {
         setIsLoading(false);
@@ -200,7 +200,7 @@ const LoginScreen = () => {
           </View>
 
           <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
-            <Ionicons name="finger-print" size={24} color={themeColors.secondary} />
+                            <Ionicons name="finger-print" size={24} color={themeColors.secondary} />
             <Text style={styles.biometricButtonText}>Entrar com biometria</Text>
           </TouchableOpacity>
         </View>

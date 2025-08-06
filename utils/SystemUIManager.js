@@ -21,7 +21,7 @@ class SystemUIManager {
             [color, lightButtons]
           );
         }
-        console.log(`Navigation Bar definida: ${color}, light buttons: ${lightButtons}`);
+        // Navigation Bar definida
       } catch (error) {
         console.warn('Não foi possível definir cor da navigation bar:', error);
       }

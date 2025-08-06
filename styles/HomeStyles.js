@@ -334,6 +334,34 @@ const createStyles = () => {
       fontSize: 12,
       color: themeColors.textSecondary || themeColors.darkGray,
     },
+    // Estilos para estados de loading, erro e vazio das notícias
+    newsLoading: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    newsLoadingText: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      textAlign: 'center',
+    },
+    newsError: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    newsErrorText: {
+      fontSize: 14,
+      color: themeColors.error,
+      textAlign: 'center',
+    },
+    newsEmpty: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    newsEmptyText: {
+      fontSize: 14,
+      color: themeColors.textSecondary || themeColors.darkGray,
+      textAlign: 'center',
+    },
   });
 };
 
