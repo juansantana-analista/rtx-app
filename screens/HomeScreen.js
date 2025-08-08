@@ -87,7 +87,6 @@ const HomeScreen = ({ onWallet, onProfile, onLogout, onNavigate, onOpenMenu, sho
       setNews(newsData.slice(0, 4));
     } catch (error) {
       setNewsError('Erro ao carregar notícias');
-      console.error('Erro ao buscar notícias:', error);
     } finally {
       setIsLoadingNews(false);
     }

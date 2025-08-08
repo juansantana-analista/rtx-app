@@ -34,7 +34,7 @@ const ClientDetailsScreen = ({ onBack, onNavigate, route }) => {
     cpf: '123.456.789-00',
     email: 'joao.silva@email.com',
     phone: '(11) 99999-9999',
-    address: 'Rua das Flores, 123 - São Paulo, SP',
+    address: 'Rua das Flores, 123 - Maringá, PR',
     totalInvested: 150000,
     totalBalance: 165000,
     yield: 10.5,

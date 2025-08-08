@@ -8,6 +8,8 @@ import {
   FlatList,
   Alert,
   Image,
+  Animated,
+  LinearGradient,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../constants/ThemeContext';
@@ -25,6 +27,7 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('todos');
   const [selectedPriceRange, setSelectedPriceRange] = useState('todos');
+  const [scrollY] = useState(new Animated.Value(0));
 
   // Mock data para veículos de luxo
   const mockVehicles = [
@@ -49,7 +52,7 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
       features: ['GPS', 'Ar Condicionado', 'Couro', 'Bluetooth', 'Câmera de Ré'],
       available: true,
       badge: 'Premium',
-      location: 'São Paulo, SP',
+      location: 'Maringá, PR',
       rating: 4.9,
       reviews: 127,
     },
@@ -99,7 +102,7 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
       features: ['GPS', 'Ar Condicionado', 'Couro', 'Bluetooth', 'Sport Chrono'],
       available: true,
       badge: 'Sport',
-      location: 'São Paulo, SP',
+      location: 'Maringá, PR',
       rating: 4.9,
       reviews: 156,
     },
@@ -149,7 +152,7 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
       features: ['GPS', 'Ar Condicionado', 'Couro', 'Bluetooth', 'Carregamento Rápido'],
       available: true,
       badge: 'Electric',
-      location: 'São Paulo, SP',
+      location: 'Maringá, PR',
       rating: 4.9,
       reviews: 42,
     },
@@ -174,25 +177,25 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
       features: ['GPS', 'Ar Condicionado', 'Couro', 'Bluetooth', 'Launch Control'],
       available: true,
       badge: 'Super Sport',
-      location: 'São Paulo, SP',
+      location: 'Maringá, PR',
       rating: 5.0,
       reviews: 28,
     },
   ];
 
   const categories = [
-    { id: 'todos', name: 'Todos' },
-    { id: 'sedan', name: 'Sedan' },
-    { id: 'suv', name: 'SUV' },
-    { id: 'esportivo', name: 'Esportivo' },
-    { id: 'elétrico', name: 'Elétrico' },
+    { id: 'todos', name: 'Todos', icon: 'car-outline' },
+    { id: 'sedan', name: 'Sedan', icon: 'car-outline' },
+    { id: 'suv', name: 'SUV', icon: 'car-sport-outline' },
+    { id: 'esportivo', name: 'Esportivo', icon: 'flash-outline' },
+    { id: 'elétrico', name: 'Elétrico', icon: 'battery-charging-outline' },
   ];
 
   const priceRanges = [
     { id: 'todos', name: 'Todos os preços' },
-    { id: 'economico', name: 'Até R$ 2.000' },
-    { id: 'medio', name: 'R$ 2.000 - R$ 3.500' },
-    { id: 'premium', name: 'Acima de R$ 3.500' },
+    { id: 'economico', name: 'Até R$ 2.000', max: 2000 },
+    { id: 'medio', name: 'R$ 2.000 - R$ 3.500', min: 2000, max: 3500 },
+    { id: 'premium', name: 'Acima de R$ 3.500', min: 3500 },
   ];
 
   useEffect(() => {
@@ -235,16 +238,18 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
 
     // Filtro por preço
     if (selectedPriceRange !== 'todos') {
-      switch (selectedPriceRange) {
-        case 'economico':
-          filtered = filtered.filter(vehicle => vehicle.price <= 2000);
-          break;
-        case 'medio':
-          filtered = filtered.filter(vehicle => vehicle.price > 2000 && vehicle.price <= 3500);
-          break;
-        case 'premium':
-          filtered = filtered.filter(vehicle => vehicle.price > 3500);
-          break;
+      const range = priceRanges.find(r => r.id === selectedPriceRange);
+      if (range) {
+        filtered = filtered.filter(vehicle => {
+          if (range.min && range.max) {
+            return vehicle.price > range.min && vehicle.price <= range.max;
+          } else if (range.max) {
+            return vehicle.price <= range.max;
+          } else if (range.min) {
+            return vehicle.price > range.min;
+          }
+          return true;
+        });
       }
     }
 
@@ -257,6 +262,17 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
       currency: 'BRL',
       minimumFractionDigits: 0,
     });
+  };
+
+  const getBadgeColor = (badge) => {
+    const colors = {
+      'Premium': '#FFD700',
+      'Luxury': '#9370DB',
+      'Sport': '#FF4500',
+      'Electric': '#00FF7F',
+      'Super Sport': '#FF1493'
+    };
+    return colors[badge] || themeColors.secondary;
   };
 
   const handleVehiclePress = (vehicle) => {
@@ -276,72 +292,170 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
     );
   };
 
-  const renderVehicleCard = ({ item }) => (
-    <View style={styles.vehicleCard}>
-      <View style={styles.vehicleImageContainer}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.vehicleImage}
-          resizeMode="cover"
-        />
-        {item.badge && (
-          <View style={styles.vehicleBadge}>
+  const renderCategoryItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.categoryChip,
+        selectedCategory === item.id && styles.categoryChipActive
+      ]}
+      onPress={() => setSelectedCategory(item.id)}
+      activeOpacity={0.7}
+    >
+      <Ionicons 
+        name={item.icon}
+        size={16} 
+        color={selectedCategory === item.id ? themeColors.white : themeColors.textSecondary} 
+      />
+      <Text style={[
+        styles.categoryChipText,
+        selectedCategory === item.id && styles.categoryChipTextActive
+      ]}>
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderVehicleCard = ({ item, index }) => (
+    <Animated.View 
+      style={[
+        styles.vehicleCard,
+        {
+          opacity: scrollY.interpolate({
+            inputRange: [0, 100 * index, 100 * (index + 1)],
+            outputRange: [0.3, 1, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [{
+            translateY: scrollY.interpolate({
+              inputRange: [0, 100 * index, 100 * (index + 1)],
+              outputRange: [50, 0, 0],
+              extrapolate: 'clamp',
+            }),
+          }],
+        }
+      ]}
+    >
+      <TouchableOpacity
+        onPress={() => handleVehiclePress(item)}
+        activeOpacity={0.95}
+      >
+        {/* Imagem do Veículo */}
+        <View style={styles.vehicleImageContainer}>
+          <Image
+            source={{ uri: item.image }}
+            style={styles.vehicleImage}
+            resizeMode="cover"
+          />
+          
+          {/* Overlay gradiente */}
+          <View style={styles.imageOverlay} />
+          
+          {/* Badge */}
+          <View style={[styles.vehicleBadge, { backgroundColor: getBadgeColor(item.badge) }]}>
             <Text style={styles.vehicleBadgeText}>{item.badge}</Text>
           </View>
-        )}
-      </View>
-      
-      <View style={styles.vehicleInfo}>
-        <View style={styles.vehicleHeader}>
-          <Text style={styles.vehicleTitle}>{item.brand} {item.name}</Text>
-          <Text style={styles.vehiclePrice}>{formatCurrency(item.price)}</Text>
-        </View>
-        
-        <Text style={styles.vehicleSubtitle}>{item.model} • {item.year}</Text>
-        
-        <View style={styles.vehicleSpecs}>
-          <View style={styles.vehicleSpec}>
-            <Ionicons name="speedometer" size={16} color={themeColors.textSecondary} />
-            <Text style={styles.vehicleSpecText}>{item.specs.power}</Text>
-          </View>
-          <View style={styles.vehicleSpec}>
-            <Ionicons name="people" size={16} color={themeColors.textSecondary} />
-            <Text style={styles.vehicleSpecText}>{item.specs.seats} lugares</Text>
-          </View>
-          <View style={styles.vehicleSpec}>
-            <Ionicons name="star" size={16} color={themeColors.textSecondary} />
-            <Text style={styles.vehicleSpecText}>{item.rating} ({item.reviews})</Text>
-          </View>
-        </View>
-        
-        <View style={styles.vehicleActions}>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => handleVehiclePress(item)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.secondaryButtonText}>Detalhes</Text>
-          </TouchableOpacity>
           
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => handleRentPress(item)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.primaryButtonText}>Alugar</Text>
-          </TouchableOpacity>
+          {/* Indicador de disponibilidade */}
+          <View style={styles.availabilityIndicator}>
+            <View style={[styles.availabilityDot, { backgroundColor: item.available ? '#00FF7F' : '#FF4500' }]} />
+            <Text style={styles.availabilityText}>
+              {item.available ? 'Disponível' : 'Indisponível'}
+            </Text>
+          </View>
+
+          {/* Preço destacado */}
+          <View style={styles.priceOverlay}>
+            <Text style={styles.overlayPrice}>{formatCurrency(item.price)}</Text>
+            <Text style={styles.overlayPriceType}>{item.priceType}</Text>
+          </View>
         </View>
-      </View>
-    </View>
+        
+        {/* Informações do Veículo */}
+        <View style={styles.vehicleInfo}>
+          <View style={styles.vehicleHeader}>
+            <View style={styles.vehicleTitleSection}>
+              <Text style={styles.vehicleBrand}>{item.brand}</Text>
+              <Text style={styles.vehicleTitle}>{item.name}</Text>
+              <Text style={styles.vehicleSubtitle}>{item.model} • {item.year}</Text>
+            </View>
+          </View>
+          
+          {/* Especificações em chips */}
+          <View style={styles.vehicleSpecs}>
+            <View style={styles.specChip}>
+              <Ionicons name="speedometer-outline" size={14} color={themeColors.primary} />
+              <Text style={styles.specText}>{item.specs.power}</Text>
+            </View>
+            <View style={styles.specChip}>
+              <Ionicons name="people-outline" size={14} color={themeColors.primary} />
+              <Text style={styles.specText}>{item.specs.seats} lugares</Text>
+            </View>
+            <View style={styles.specChip}>
+              <Ionicons name="water-outline" size={14} color={themeColors.primary} />
+              <Text style={styles.specText}>{item.specs.fuel}</Text>
+            </View>
+          </View>
+          
+          {/* Rating e localização */}
+          <View style={styles.vehicleMetrics}>
+            <View style={styles.ratingSection}>
+              <Ionicons name="star" size={14} color="#FFD700" />
+              <Text style={styles.ratingText}>{item.rating}</Text>
+              <Text style={styles.reviewsText}>({item.reviews})</Text>
+            </View>
+            <View style={styles.locationSection}>
+              <Ionicons name="location-outline" size={14} color={themeColors.textSecondary} />
+              <Text style={styles.locationText}>{item.location}</Text>
+            </View>
+          </View>
+          
+          {/* Botões de ação */}
+          <View style={styles.vehicleActions}>
+            <TouchableOpacity
+              style={styles.detailsButton}
+              onPress={() => handleVehiclePress(item)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="information-circle-outline" size={16} color={themeColors.white} />
+              <Text style={styles.detailsButtonText}>Detalhes</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.rentButton, !item.available && styles.rentButtonDisabled]}
+              onPress={() => item.available && handleRentPress(item)}
+              activeOpacity={0.7}
+              disabled={!item.available}
+            >
+              <Ionicons name="car-outline" size={16} color={themeColors.white} />
+              <Text style={styles.rentButtonText}>
+                {item.available ? 'Alugar' : 'Indisponível'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="car-sport" style={styles.emptyIcon} />
+      <View style={styles.emptyIconContainer}>
+        <Ionicons name="car-sport-outline" size={80} color={themeColors.textSecondary} />
+      </View>
       <Text style={styles.emptyTitle}>Nenhum veículo encontrado</Text>
       <Text style={styles.emptyMessage}>
         Não encontramos veículos com os filtros selecionados. Tente ajustar sua busca.
       </Text>
+      <TouchableOpacity 
+        style={styles.clearFiltersButton}
+        onPress={() => {
+          setSearchQuery('');
+          setSelectedCategory('todos');
+          setSelectedPriceRange('todos');
+        }}
+      >
+        <Text style={styles.clearFiltersText}>Limpar filtros</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -365,7 +479,15 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
         rightActions={rightActions}
       />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.heroBackground} />
@@ -380,12 +502,14 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
             <Image 
               source={require('../assets/tsx-logo.png')} 
               style={styles.heroLogo}
+              resizeMode="contain"
             />
             <Text style={styles.heroLogoText}>LOCADORA</Text>
             <Text style={styles.heroSubtitle}>
               Descubra a excelência em locação de veículos de luxo{'\n'}
               Experiência única e personalizada
             </Text>
+            
           </View>
         </View>
 
@@ -395,82 +519,94 @@ const TSXLocadoraScreen = ({ onBack, onNavigate, showFloatingNav = false }) => {
             <Ionicons name="search" size={20} color={themeColors.textSecondary} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Buscar veículos..."
+              placeholder="Buscar veículos, marcas ou modelos..."
               placeholderTextColor={themeColors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
+            {searchQuery ? (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color={themeColors.textSecondary} />
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
 
         {/* Filters Section */}
         <View style={styles.filtersSection}>
           <Text style={styles.filtersTitle}>Categorias</Text>
-          <View style={styles.filtersRow}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                style={[
-                  styles.filterChip,
-                  selectedCategory === category.id && styles.filterChipActive
-                ]}
-                onPress={() => setSelectedCategory(category.id)}
-                activeOpacity={0.7}
-              >
-                <Text style={[
-                  styles.filterChipText,
-                  selectedCategory === category.id && styles.filterChipTextActive
-                ]}>
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <FlatList
+            data={categories}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesList}
+          />
 
-          <Text style={[styles.filtersTitle, { marginTop: 16 }]}>Faixa de Preço</Text>
-          <View style={styles.filtersRow}>
+          <Text style={[styles.filtersTitle, { marginTop: 20 }]}>Faixa de Preço</Text>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.priceFiltersList}
+          >
             {priceRanges.map((range) => (
               <TouchableOpacity
                 key={range.id}
                 style={[
-                  styles.filterChip,
-                  selectedPriceRange === range.id && styles.filterChipActive
+                  styles.priceFilterChip,
+                  selectedPriceRange === range.id && styles.priceFilterChipActive
                 ]}
                 onPress={() => setSelectedPriceRange(range.id)}
                 activeOpacity={0.7}
               >
                 <Text style={[
-                  styles.filterChipText,
-                  selectedPriceRange === range.id && styles.filterChipTextActive
+                  styles.priceFilterText,
+                  selectedPriceRange === range.id && styles.priceFilterTextActive
                 ]}>
                   {range.name}
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Vehicles Section */}
         <View style={styles.vehiclesSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>
-              Veículos Disponíveis ({filteredVehicles.length})
+              Veículos Disponíveis
             </Text>
+            <View style={styles.resultsBadge}>
+              <Text style={styles.resultsText}>{filteredVehicles.length}</Text>
+            </View>
           </View>
 
-          {filteredVehicles.length > 0 ? (
-            filteredVehicles.map((vehicle) => (
-              <View key={vehicle.id}>
-                {renderVehicleCard({ item: vehicle })}
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <View style={styles.loadingCard}>
+                <Ionicons name="car-sport" size={40} color={themeColors.primary} />
+                <Text style={styles.loadingText}>Carregando veículos...</Text>
               </View>
-            ))
+            </View>
+          ) : filteredVehicles.length > 0 ? (
+            <FlatList
+              data={filteredVehicles}
+              renderItem={renderVehicleCard}
+              keyExtractor={(item) => item.id.toString()}
+              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.vehiclesList}
+            />
           ) : (
             renderEmptyState()
           )}
         </View>
-      </ScrollView>
+
+
+      </Animated.ScrollView>
     </View>
   );
 };
 
-export default TSXLocadoraScreen; 
+export default TSXLocadoraScreen;
