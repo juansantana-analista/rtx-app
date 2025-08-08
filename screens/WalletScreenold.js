@@ -56,6 +56,8 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
         params: { pessoa_id: user.pessoaid }
       });
       
+
+      
       if (result.status === 'success' && result.data && result.data.length > 0) {
         setBalance(result.data[0].saldo);
         setTotalBalance(result.data[0].saldo_total);
@@ -67,6 +69,8 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
     } catch (e) {
       // Se for erro de autenticação, não mostra erro na tela
       if (e.message.includes('Sessão expirada') || e.message.includes('Token') || e.message.includes('login')) {
+        // Erro de autenticação ao buscar saldo
+        // O logout será tratado automaticamente pelo apiRequest
         return;
       }
       setBalanceError(e.message || 'Erro ao buscar saldo');
@@ -325,6 +329,10 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
     });
   };
 
+
+
+
+
   // Dados mockados do extrato
   const transactionHistory = [
     {
@@ -407,160 +415,138 @@ const WalletScreen = ({ onBack, showFloatingNav = true, onNavigate, onFloatingNa
 
       {/* Conteúdo Rolável */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Card Principal */}
-        <View style={styles.balanceCard}>
-          <View style={styles.balanceHeader}>
-            <View style={styles.balanceInfo}>
-              <Text style={styles.balanceLabel}>SALDO TOTAL EM OPERAÇÃO</Text>
-              <Text style={styles.balance}>
-                {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(totalBalance || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
-              </Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.balanceVisibilityButton}
-              onPress={() => setIsBalanceVisible(!isBalanceVisible)}
-            >
-              <Ionicons 
-                name={isBalanceVisible ? "eye-off" : "eye"} 
-                size={20} 
-                color={themeColors.secondary} 
-              />
-            </TouchableOpacity>
-          </View>
-          {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
-          
-          {/* Botão Novo Aporte */}
-          <TouchableOpacity 
-            style={styles.newAporteButton}
-            onPress={() => onNavigate && onNavigate('aportes')}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="add-circle" size={24} color={themeColors.white} />
-            <Text style={styles.newAporteButtonText}>Novo Aporte</Text>
-          </TouchableOpacity>
+                 {/* Card Principal */}
+         <View style={styles.balanceCard}>
+           <View style={styles.balanceHeader}>
+             <View style={styles.balanceInfo}>
+               <Text style={styles.balanceLabel}>SALDO TOTAL EM OPERAÇÃO</Text>
+               <Text style={styles.balance}>
+                 {isLoadingBalance ? 'Carregando...' : (isBalanceVisible ? `R$ ${Number(totalBalance || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••')}
+               </Text>
+             </View>
+             <TouchableOpacity 
+               style={styles.balanceVisibilityButton}
+               onPress={() => setIsBalanceVisible(!isBalanceVisible)}
+             >
+               <Ionicons 
+                 name={isBalanceVisible ? "eye-off" : "eye"} 
+                 size={20} 
+                 color={themeColors.secondary} 
+               />
+             </TouchableOpacity>
+           </View>
+           {balanceError ? <Text style={{color: 'red', fontSize: 12}}>{balanceError}</Text> : null}
+           
+           {/* Botão Novo Aporte */}
+           <TouchableOpacity 
+             style={styles.newAporteButton}
+             onPress={() => onNavigate && onNavigate('aportes')}
+             activeOpacity={0.8}
+           >
+             <Ionicons name="add-circle" size={24} color={themeColors.white} />
+             <Text style={styles.newAporteButtonText}>Novo Aporte</Text>
+           </TouchableOpacity>
 
-          {/* Seção de Resgate */}
-          <View style={styles.rescueSection}>
-            <Text style={styles.rescueLabel}>Disponível para resgate</Text>
-            <Ionicons name="help-circle" size={16} color={themeColors.secondary} style={styles.rescueHelp} />
-            <View style={styles.rescueRow}>
-              <View style={styles.rescueAmountContainer}>
-                <Text style={styles.rescueAmount}>
-                  {isRescueBalanceVisible ? `R$ ${Number(balance || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••'}
-                </Text>
-                <TouchableOpacity 
-                  style={styles.rescueBalanceVisibilityButton}
-                  onPress={() => setIsRescueBalanceVisible(!isRescueBalanceVisible)}
-                >
-                  <Ionicons 
-                    name={isRescueBalanceVisible ? "eye-off" : "eye"} 
-                    size={16} 
-                    color={themeColors.secondary} 
-                  />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity onPress={openRescueModal}>
-                <Text style={styles.rescueButton}>Resgatar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+           {/* Seção de Resgate */}
+           <View style={styles.rescueSection}>
+             <Text style={styles.rescueLabel}>Disponível para resgate</Text>
+             <Ionicons name="help-circle" size={16} color={themeColors.secondary} style={styles.rescueHelp} />
+             <View style={styles.rescueRow}>
+               <View style={styles.rescueAmountContainer}>
+                 <Text style={styles.rescueAmount}>
+                   {isRescueBalanceVisible ? `R$ ${Number(balance || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '••••••••••'}
+                 </Text>
+                 <TouchableOpacity 
+                   style={styles.rescueBalanceVisibilityButton}
+                   onPress={() => setIsRescueBalanceVisible(!isRescueBalanceVisible)}
+                 >
+                   <Ionicons 
+                     name={isRescueBalanceVisible ? "eye-off" : "eye"} 
+                     size={16} 
+                     color={themeColors.secondary} 
+                   />
+                 </TouchableOpacity>
+               </View>
+               <TouchableOpacity onPress={openRescueModal}>
+                 <Text style={styles.rescueButton}>Resgatar</Text>
+               </TouchableOpacity>
+             </View>
+           </View>
         </View>
 
-        {/* Nova Seção de Investimentos Simplificada */}
+        {/* Seção de Cartões de Investimento */}
         <View style={styles.investmentsSection}>
           <View style={styles.investmentsHeader}>
             <Text style={styles.investmentsTitle}>Meus Investimentos</Text>
-            <View style={styles.totalInvestmentsContainer}>
-              <Text style={styles.totalInvestmentsLabel}>Total:</Text>
-              <Text style={styles.totalInvestmentsValue}>
-                R$ {userInvestments.reduce((sum, inv) => sum + inv.investedAmount, 0).toLocaleString('pt-BR')}
-              </Text>
-            </View>
+            <Ionicons name="help-circle" size={16} color={themeColors.secondary} />
           </View>
 
-          <View style={styles.investmentsList}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.investmentsScroll}
+            contentContainerStyle={styles.investmentsScrollContent}
+          >
             {userInvestments.map((investment) => (
               <TouchableOpacity
                 key={investment.id}
-                style={styles.investmentRow}
+                style={[styles.investmentCard, { backgroundColor: investment.color }]}
                 onPress={() => console.log('Investimento clicado:', investment.productName)}
-                activeOpacity={0.7}
+                activeOpacity={0.8}
               >
-                {/* Status e Nome do Produto */}
-                <View style={styles.investmentLeft}>
-                  <View style={styles.productHeader}>
-                    <View style={styles.productNameContainer}>
-                      <Text style={styles.productBadge}>RTX</Text>
-                      <Text style={styles.productName}>{investment.productName}</Text>
-                    </View>
-                    <View style={[styles.statusIndicator, { 
-                      backgroundColor: investment.status === 'active' ? themeColors.success : themeColors.error 
-                    }]} />
+                {/* Header do Cartão */}
+                <View style={styles.cardHeader}>
+                  <View style={styles.companyLogo}>
+                    <Text style={styles.companyLogoText}>{investment.companyLogo}</Text>
                   </View>
-                  
-                  {/* Informações Básicas */}
-                  <View style={styles.investmentDetails}>
-                    <View style={styles.detailItem}>
-                      <Ionicons name="time-outline" size={14} color={themeColors.textSecondary} />
-                      <Text style={styles.detailText}>{investment.period}</Text>
-                    </View>
-                    <View style={styles.detailItem}>
-                      <Ionicons name="trending-up-outline" size={14} color={themeColors.success} />
-                      <Text style={[styles.detailText, { color: themeColors.success }]}>{investment.yield}</Text>
-                    </View>
-                    <View style={styles.detailItem}>
-                      <Ionicons name="calendar-outline" size={14} color={themeColors.textSecondary} />
-                      <Text style={styles.detailText}>{formatDate(investment.dueDate)}</Text>
-                    </View>
+                  <View style={styles.cardStatus}>
+                    <View style={[styles.statusDot, { backgroundColor: investment.status === 'active' ? themeColors.success : themeColors.error }]} />
+                    <Text style={styles.statusText}>
+                      {investment.status === 'active' ? 'Ativo' : 'Inativo'}
+                    </Text>
                   </View>
                 </View>
 
-                {/* Valor e Visibilidade */}
-                <View style={styles.investmentRight}>
-                  <View style={styles.amountContainer}>
-                    <Text style={styles.investmentAmount}>
-                      {visibleCards[investment.id] 
-                        ? `R$ ${investment.investedAmount.toLocaleString('pt-BR')}` 
-                        : '••••••••••'
-                      }
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.eyeButton}
-                      onPress={() => toggleCardVisibility(investment.id)}
-                    >
-                      <Ionicons 
-                        name={visibleCards[investment.id] ? "eye-off-outline" : "eye-outline"} 
-                        size={18} 
-                        color={themeColors.textSecondary} 
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  
-                  {/* Indicador de Progresso */}
-                  <View style={styles.progressContainer}>
-                    <View style={styles.progressBar}>
-                      <View style={[styles.progressFill, { 
-                        width: '70%', // Você pode calcular baseado no tempo decorrido
-                        backgroundColor: themeColors.secondary 
-                      }]} />
-                    </View>
-                    <Text style={styles.progressText}>70% do prazo</Text>
-                  </View>
-                  
-                  <Ionicons name="chevron-forward" size={20} color={themeColors.textTertiary} />
+                {/* Nome do Produto */}
+                <Text style={styles.productName}>{investment.productName}</Text>
+
+                {/* Valor Investido */}
+                <View style={styles.amountContainer}>
+                  <Text style={styles.investedAmount}>
+                    {visibleCards[investment.id] ? `R$ ${investment.investedAmount.toLocaleString('pt-BR')}` : '••••••••••'}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => toggleCardVisibility(investment.id)}
+                  >
+                    <Ionicons 
+                      name={visibleCards[investment.id] ? "eye-off" : "eye"} 
+                      size={16} 
+                      color={themeColors.white} 
+                    />
+                  </TouchableOpacity>
                 </View>
+
+                {/* Informações do Investimento */}
+                <View style={styles.investmentInfo}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Período:</Text>
+                    <Text style={styles.infoValue}>{investment.period}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Rentabilidade:</Text>
+                    <Text style={styles.infoValue}>{investment.yield}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Vencimento:</Text>
+                    <Text style={styles.infoValue}>{formatDate(investment.dueDate)}</Text>
+                  </View>
+                </View>
+
+                
               </TouchableOpacity>
             ))}
-          </View>
-
-          {/* Botão Ver Todos */}
-          <TouchableOpacity 
-            style={styles.viewAllButton}
-            onPress={() => onNavigate && onNavigate('investment')}
-          >
-            <Text style={styles.viewAllText}>Ver Todos os Investimentos</Text>
-            <Ionicons name="arrow-forward" size={16} color={themeColors.primary} />
-          </TouchableOpacity>
+          </ScrollView>
         </View>
 
         {/* Seção do Extrato */}

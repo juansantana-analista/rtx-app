@@ -75,6 +75,124 @@ const createStyles = () => {
       color: themeColors.white,
       marginLeft: 8,
     },
+
+    // Seção de Investimentos
+    investmentsSection: {
+      marginBottom: 10,
+      paddingBottom: 10,
+    },
+    investmentsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+      paddingHorizontal: 20,
+    },
+    investmentsTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: themeColors.text,
+    },
+    investmentsScroll: {
+      paddingLeft: 20,
+      paddingBottom: 10,
+    },
+    investmentsScrollContent: {
+      paddingRight: 20,
+      paddingBottom: 10,
+    },
+
+    // Cartão de Investimento
+    investmentCard: {
+      width: 280,
+      height: 220,
+      borderRadius: 16,
+      padding: 20,
+      marginRight: 16,
+      shadowColor: themeColors.shadow || themeColors.black,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+      justifyContent: 'space-between',
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    companyLogo: {
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    companyLogoText: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: themeColors.white,
+    },
+    cardStatus: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      marginRight: 4,
+    },
+    statusText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: themeColors.white,
+    },
+    productName: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: themeColors.white,
+      marginTop: 8,
+    },
+    amountContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    investedAmount: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: themeColors.white,
+      flex: 1,
+    },
+    eyeButton: {
+      padding: 4,
+      borderRadius: 4,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    investmentInfo: {
+      marginTop: 12,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 4,
+    },
+    infoLabel: {
+      fontSize: 12,
+      color: 'rgba(255, 255, 255, 0.8)',
+    },
+    infoValue: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: themeColors.white,
+    },
+
+
     rescueSection: {
       borderTopWidth: 1,
       borderTopColor: themeColors.border || themeColors.mediumGray,
@@ -123,200 +241,47 @@ const createStyles = () => {
       fontWeight: '600',
     },
 
-    // Nova Seção de Investimentos - Estilos Simplificados
-    investmentsSection: {
-      backgroundColor: themeColors.cardBackground,
-      margin: 20,
-      borderRadius: 16,
-      shadowColor: themeColors.shadow || themeColors.black,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 6,
-      borderWidth: 1,
-      borderColor: themeColors.border || themeColors.mediumGray,
-      overflow: 'hidden',
+    investmentTypesList: {
+      marginTop: 20,
     },
-
-    investmentsHeader: {
+    investmentTypeRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: 20,
-      borderBottomWidth: 1,
-      borderBottomColor: themeColors.border || themeColors.mediumGray,
-      backgroundColor: themeColors.primary,
-    },
-
-    investmentsTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: themeColors.white,
-      letterSpacing: -0.2,
-    },
-
-    totalInvestmentsContainer: {
-      alignItems: 'flex-end',
-    },
-
-    totalInvestmentsLabel: {
-      fontSize: 12,
-      color: 'rgba(255, 255, 255, 0.8)',
-      marginBottom: 2,
-      fontWeight: '500',
-    },
-
-    totalInvestmentsValue: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: themeColors.white,
-      letterSpacing: -0.2,
-    },
-
-    investmentsList: {
-      paddingHorizontal: 0,
-    },
-
-    investmentRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 20,
       paddingVertical: 18,
       borderBottomWidth: 1,
       borderBottomColor: themeColors.border || themeColors.mediumGray,
       backgroundColor: themeColors.cardBackground,
-    },
-
-    investmentLeft: {
-      flex: 1,
-      marginRight: 16,
-    },
-
-    productHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: 12,
-    },
-
-    productNameContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-
-    productBadge: {
-      fontSize: 10,
-      fontWeight: 'bold',
-      color: themeColors.white,
-      backgroundColor: themeColors.primary,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 4,
-      marginRight: 8,
-      textAlign: 'center',
-      minWidth: 32,
-      overflow: 'hidden',
-    },
-
-    productName: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: themeColors.text,
-      letterSpacing: -0.3,
-    },
-
-    statusIndicator: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-    },
-
-    investmentDetails: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12,
-    },
-
-    detailItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginRight: 12,
-    },
-
-    detailText: {
-      fontSize: 13,
-      color: themeColors.textSecondary || themeColors.darkGray,
-      marginLeft: 4,
-      fontWeight: '500',
-    },
-
-    investmentRight: {
-      alignItems: 'flex-end',
-      justifyContent: 'space-between',
-      minWidth: 120,
-    },
-
-    amountContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
       marginBottom: 8,
+      borderRadius: 12,
+      paddingHorizontal: 16,
     },
-
-    investmentAmount: {
+    investmentTypeLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    percentageCircle: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: themeColors.lightGray,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+      borderWidth: 2,
+      borderColor: themeColors.border || themeColors.mediumGray,
+    },
+    percentageText: {
       fontSize: 16,
       fontWeight: 'bold',
       color: themeColors.text,
-      marginRight: 8,
-      letterSpacing: -0.2,
     },
-
-    eyeButton: {
-      padding: 4,
-      borderRadius: 6,
-      backgroundColor: themeColors.lightGray,
-    },
-
-    progressContainer: {
-      alignItems: 'flex-end',
-      marginBottom: 4,
-    },
-
-    progressBar: {
-      width: 80,
-      height: 4,
-      backgroundColor: themeColors.lightGray,
-      borderRadius: 2,
-      overflow: 'hidden',
-      marginBottom: 4,
-    },
-
-    progressFill: {
-      height: '100%',
-      borderRadius: 2,
-    },
-
-    progressText: {
-      fontSize: 11,
-      color: themeColors.textSecondary || themeColors.darkGray,
-      fontWeight: '500',
-    },
-
-    viewAllButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 16,
-      backgroundColor: themeColors.lightGray,
-      marginTop: 8,
-    },
-
-    viewAllText: {
-      fontSize: 14,
+    investmentTypeName: {
+      fontSize: 16,
+      color: themeColors.text,
       fontWeight: '600',
-      color: themeColors.primary,
-      marginRight: 6,
+      letterSpacing: -0.1,
     },
-
     extractSection: {
       backgroundColor: themeColors.cardBackground,
       margin: 20,
