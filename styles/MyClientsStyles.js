@@ -50,13 +50,55 @@ const createStyles = (themeColors) => {
       marginBottom: 4,
       textAlign: 'center',
     },
-         summaryValue: {
-       fontSize: 16,
-       fontWeight: 'bold',
-       color: themeColors.text,
-       textAlign: 'center',
-       numberOfLines: 1,
-     },
+    summaryValue: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      textAlign: 'center',
+      numberOfLines: 1,
+    },
+
+    // Botão de Adicionar Cliente
+    addClientButton: {
+      backgroundColor: themeColors.primary,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 24,
+      flexDirection: 'row',
+      alignItems: 'center',
+      shadowColor: themeColors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    addClientIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+    },
+    addClientContent: {
+      flex: 1,
+    },
+    addClientTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: themeColors.white,
+      marginBottom: 4,
+      letterSpacing: -0.2,
+    },
+    addClientSubtitle: {
+      fontSize: 14,
+      color: 'rgba(255, 255, 255, 0.8)',
+      lineHeight: 18,
+    },
+
     clientsSection: {
       marginBottom: 20,
     },
@@ -163,31 +205,31 @@ const createStyles = (themeColors) => {
       marginLeft: 8,
       flex: 1,
     },
-         clientFinancial: {
-       marginBottom: 16,
-       paddingTop: 16,
-       borderTopWidth: 1,
-       borderTopColor: themeColors.border,
-     },
-     financialItem: {
-       flexDirection: 'row',
-       justifyContent: 'space-between',
-       alignItems: 'center',
-       marginBottom: 8,
-     },
-     financialLabel: {
-       fontSize: 12,
-       fontWeight: '500',
-       color: themeColors.textSecondary,
-       flex: 1,
-     },
-     financialValue: {
-       fontSize: 14,
-       fontWeight: 'bold',
-       color: themeColors.text,
-       textAlign: 'right',
-       flex: 1,
-     },
+    clientFinancial: {
+      marginBottom: 16,
+      paddingTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: themeColors.border,
+    },
+    financialItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    financialLabel: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: themeColors.textSecondary,
+      flex: 1,
+    },
+    financialValue: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: themeColors.text,
+      textAlign: 'right',
+      flex: 1,
+    },
     clientFooter: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -196,16 +238,15 @@ const createStyles = (themeColors) => {
       borderTopWidth: 1,
       borderTopColor: themeColors.border,
     },
-         lastActivity: {
-       fontSize: 12,
-       color: themeColors.textSecondary,
-       fontWeight: '500',
-     },
-     skeletonLine: {
-       borderRadius: 4,
-     },
-     
-   });
- };
+    lastActivity: {
+      fontSize: 12,
+      color: themeColors.textSecondary,
+      fontWeight: '500',
+    },
+    skeletonLine: {
+      borderRadius: 4,
+    },
+  });
+};
 
-export default createStyles; 
+export default createStyles;

@@ -21,16 +21,16 @@
         "backgroundColor": "#0F1419"
       },
       "edgeToEdgeEnabled": false,
-      "statusBar": {
-        "backgroundColor": "#113334",
-        "barStyle": "light-content",
-        "translucent": false
-      },
-      "navigationBar": {
-        "backgroundColor": "#0F1419",
-        "barStyle": "light-content"
-      },
       "package": "com.juansantana.analista.RTXAPP"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#113334",
+      "barStyle": "light-content",
+      "translucent": false
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#0F1419",
+      "barStyle": "light-content"
     },
     "web": {
       "favicon": "./assets/favicon.png"

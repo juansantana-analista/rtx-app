@@ -299,13 +299,17 @@ const MyClientsScreen = ({ onBack, onNavigate }) => {
     onNavigate('clientDetails', { clientId: client.id, client: client });
   };
 
-     const formatCurrency = (value) => {
-     return new Intl.NumberFormat('pt-BR', {
-       style: 'currency',
-       currency: 'BRL',
-       maximumFractionDigits: 0
-     }).format(value);
-   };
+  const handleAddClient = () => {
+    onNavigate('addClient');
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -330,8 +334,6 @@ const MyClientsScreen = ({ onBack, onNavigate }) => {
       action: () => Alert.alert('Filtrar', 'Funcionalidade de filtro será implementada')
     }
   ];
-
-
 
   return (
     <View style={styles.container}>
@@ -369,12 +371,12 @@ const MyClientsScreen = ({ onBack, onNavigate }) => {
             </View>
           </View>
           <View style={styles.summaryRow}>
-                         <View style={styles.summaryItem}>
-               <Text style={styles.summaryLabel}>Total Investido</Text>
-               <Text style={styles.summaryValue} numberOfLines={1}>
-                 {formatCurrency(clients.reduce((sum, c) => sum + c.totalInvested, 0))}
-               </Text>
-             </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>Total Investido</Text>
+              <Text style={styles.summaryValue} numberOfLines={1}>
+                {formatCurrency(clients.reduce((sum, c) => sum + c.totalInvested, 0))}
+              </Text>
+            </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Rentabilidade Média</Text>
               <Text style={[styles.summaryValue, { color: themeColors.success }]}>
@@ -387,110 +389,126 @@ const MyClientsScreen = ({ onBack, onNavigate }) => {
           </View>
         </View>
 
-                 {/* Lista de Clientes */}
-         <View style={styles.clientsSection}>
-           <Text style={styles.sectionTitle}>Clientes</Text>
-           
-           {error ? (
-             <View style={styles.errorContainer}>
-               <Ionicons name="alert-circle" size={24} color={themeColors.error} />
-               <Text style={[styles.errorText, { color: themeColors.error }]}>
-                 {error}
-               </Text>
-             </View>
-           ) : isLoading ? (
-             // Skeleton loading
-             Array.from({ length: 4 }).map((_, index) => (
-               <ClientSkeleton key={`skeleton-${index}`} />
-             ))
-           ) : clients.length === 0 ? (
-             <View style={styles.emptyContainer}>
-               <Ionicons name="people-outline" size={48} color={themeColors.textSecondary} />
-               <Text style={[styles.emptyText, { color: themeColors.textSecondary }]}>
-                 Nenhum cliente encontrado
-               </Text>
-               <Text style={[styles.emptySubtext, { color: themeColors.textSecondary }]}>
-                 Os clientes que você trouxer aparecerão aqui
-               </Text>
-             </View>
-           ) : (
-             clients.map((client) => (
-               <TouchableOpacity
-                 key={client.id}
-                 style={styles.clientCard}
-                 onPress={() => handleClientPress(client)}
-                 activeOpacity={0.7}
-               >
-                 <View style={styles.clientHeader}>
-                   <View style={styles.clientInfo}>
-                     <Text style={styles.clientName} numberOfLines={1}>
-                       {client.name}
-                     </Text>
-                     <Text style={styles.clientCpf}>{client.cpf}</Text>
-                   </View>
-                   <View style={styles.clientStatus}>
-                     <View style={[styles.statusDot, { backgroundColor: getStatusColor(client.status) }]} />
-                     <Text style={[styles.statusText, { color: getStatusColor(client.status) }]}>
-                       {getStatusText(client.status)}
-                     </Text>
-                   </View>
-                 </View>
+        {/* Botão de Adicionar Cliente */}
+        <TouchableOpacity
+          style={styles.addClientButton}
+          onPress={handleAddClient}
+          activeOpacity={0.8}
+        >
+          <View style={styles.addClientIcon}>
+            <Ionicons name="person-add" size={24} color={themeColors.white} />
+          </View>
+          <View style={styles.addClientContent}>
+            <Text style={styles.addClientTitle}>Adicionar Novo Cliente</Text>
+            <Text style={styles.addClientSubtitle}>Cadastre um novo cliente e defina seus investimentos</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={themeColors.white} />
+        </TouchableOpacity>
 
-                 <View style={styles.clientDetails}>
-                   <View style={styles.detailRow}>
-                     <Ionicons name="mail-outline" size={16} color={themeColors.textSecondary} />
-                     <Text style={styles.detailText} numberOfLines={1}>
-                       {client.email}
-                     </Text>
-                   </View>
-                   <View style={styles.detailRow}>
-                     <Ionicons name="call-outline" size={16} color={themeColors.textSecondary} />
-                     <Text style={styles.detailText}>
-                       {client.phone}
-                     </Text>
-                   </View>
-                 </View>
+        {/* Lista de Clientes */}
+        <View style={styles.clientsSection}>
+          <Text style={styles.sectionTitle}>Clientes</Text>
+          
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Ionicons name="alert-circle" size={24} color={themeColors.error} />
+              <Text style={[styles.errorText, { color: themeColors.error }]}>
+                {error}
+              </Text>
+            </View>
+          ) : isLoading ? (
+            // Skeleton loading
+            Array.from({ length: 4 }).map((_, index) => (
+              <ClientSkeleton key={`skeleton-${index}`} />
+            ))
+          ) : clients.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="people-outline" size={48} color={themeColors.textSecondary} />
+              <Text style={[styles.emptyText, { color: themeColors.textSecondary }]}>
+                Nenhum cliente encontrado
+              </Text>
+              <Text style={[styles.emptySubtext, { color: themeColors.textSecondary }]}>
+                Os clientes que você trouxer aparecerão aqui
+              </Text>
+            </View>
+          ) : (
+            clients.map((client) => (
+              <TouchableOpacity
+                key={client.id}
+                style={styles.clientCard}
+                onPress={() => handleClientPress(client)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.clientHeader}>
+                  <View style={styles.clientInfo}>
+                    <Text style={styles.clientName} numberOfLines={1}>
+                      {client.name}
+                    </Text>
+                    <Text style={styles.clientCpf}>{client.cpf}</Text>
+                  </View>
+                  <View style={styles.clientStatus}>
+                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(client.status) }]} />
+                    <Text style={[styles.statusText, { color: getStatusColor(client.status) }]}>
+                      {getStatusText(client.status)}
+                    </Text>
+                  </View>
+                </View>
 
-                 <View style={styles.clientFinancial}>
-                   <View style={styles.financialItem}>
-                     <Text style={styles.financialLabel}>Total Investido</Text>
-                     <Text style={styles.financialValue} numberOfLines={1}>
-                       {formatCurrency(client.totalInvested)}
-                     </Text>
-                   </View>
-                   <View style={styles.financialItem}>
-                     <Text style={styles.financialLabel}>Saldo Atual</Text>
-                     <Text style={styles.financialValue} numberOfLines={1}>
-                       {formatCurrency(client.totalBalance)}
-                     </Text>
-                   </View>
-                   <View style={styles.financialItem}>
-                     <Text style={styles.financialLabel}>Rentabilidade</Text>
-                     <Text style={[styles.financialValue, { color: themeColors.success }]} numberOfLines={1}>
-                       +{client.yield}%
-                     </Text>
-                   </View>
-                 </View>
+                <View style={styles.clientDetails}>
+                  <View style={styles.detailRow}>
+                    <Ionicons name="mail-outline" size={16} color={themeColors.textSecondary} />
+                    <Text style={styles.detailText} numberOfLines={1}>
+                      {client.email}
+                    </Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Ionicons name="call-outline" size={16} color={themeColors.textSecondary} />
+                    <Text style={styles.detailText}>
+                      {client.phone}
+                    </Text>
+                  </View>
+                </View>
 
-                 <View style={styles.clientFooter}>
-                   <Text style={styles.lastActivity}>
-                     Última atividade: {formatDate(client.lastActivity)}
-                   </Text>
-                   <Ionicons name="chevron-forward" size={16} color={themeColors.textSecondary} />
-                 </View>
-               </TouchableOpacity>
-             ))
-           )}
-         </View>
+                <View style={styles.clientFinancial}>
+                  <View style={styles.financialItem}>
+                    <Text style={styles.financialLabel}>Total Investido</Text>
+                    <Text style={styles.financialValue} numberOfLines={1}>
+                      {formatCurrency(client.totalInvested)}
+                    </Text>
+                  </View>
+                  <View style={styles.financialItem}>
+                    <Text style={styles.financialLabel}>Saldo Atual</Text>
+                    <Text style={styles.financialValue} numberOfLines={1}>
+                      {formatCurrency(client.totalBalance)}
+                    </Text>
+                  </View>
+                  <View style={styles.financialItem}>
+                    <Text style={styles.financialLabel}>Rentabilidade</Text>
+                    <Text style={[styles.financialValue, { color: themeColors.success }]} numberOfLines={1}>
+                      +{client.yield}%
+                    </Text>
+                  </View>
+                </View>
 
-                          {/* Espaço final */}
-         <View style={{ height: 20 }} />
-       </ScrollView>
+                <View style={styles.clientFooter}>
+                  <Text style={styles.lastActivity}>
+                    Última atividade: {formatDate(client.lastActivity)}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={themeColors.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
 
-               {/* Loader flutuante */}
-        {isLoading && <FloatingLoader message="Carregando clientes..." />}
-      </View>
-    );
-  };
+        {/* Espaço final */}
+        <View style={{ height: 20 }} />
+      </ScrollView>
 
-export default MyClientsScreen; 
+      {/* Loader flutuante */}
+      {isLoading && <FloatingLoader message="Carregando clientes..." />}
+    </View>
+  );
+};
+
+export default MyClientsScreen;

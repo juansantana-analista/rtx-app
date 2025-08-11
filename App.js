@@ -19,6 +19,7 @@ import ExtractPdfScreen from './screens/ExtractPdfScreen';
 import OfficesScreen from './screens/OfficesScreen';
 import MyClientsScreen from './screens/MyClientsScreen';
 import ClientDetailsScreen from './screens/ClientDetailsScreen';
+import AddClientScreen from './screens/AddClientScreen';
 
 import FloatingBottomNav from './components/FloatingBottomNav';
 import SideMenu from './components/SideMenu';
@@ -346,6 +347,14 @@ const AppContent = () => {
             showFloatingNav={false}
           />
         );
+      case 'addClient':
+        return (
+          <AddClientScreen 
+            onBack={() => handleNavigation('myClients')}
+            onNavigate={handleNavigation}
+            showFloatingNav={false}
+          />
+        );
       default:
         return (
           <HomeScreen 
@@ -393,6 +402,7 @@ const AppContent = () => {
              currentScreen !== 'aportes' &&
              currentScreen !== 'myClients' &&
              currentScreen !== 'clientDetails' &&
+             currentScreen !== 'addClient' &&
              currentScreen !== 'notifications' &&
              currentScreen !== 'notificationDetail' &&
              currentScreen !== 'news' &&
